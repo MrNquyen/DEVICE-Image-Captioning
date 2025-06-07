@@ -1,0 +1,52 @@
+dataset_attributes:
+  image_features:
+    train:
+    - 
+    val:
+    - 
+    test:
+    # - open_images/detectron_fix_100/fc6/test,m4c_textvqa_ocr_en_frcn_features/test_images
+  imdb_files:
+    train:
+    - 
+    val:
+    -   
+    test:
+    - 
+model_attributes:
+  hidden_size: 768
+  ocr_feat_dim: 256
+  obj_feat_dim: 1024
+  feature_dim: 2048
+  defum:
+    num_layers: 100 # Num obj features
+    activation: relu
+    nhead: 1
+  mutimodal_transformer_encoder:
+    num_layers: 4
+    nhead: 12
+    activation: relu
+  mutimodal_transformer_decoder:
+    vocab: ./data/vocab.txt
+    max_length: 30
+    num_layers: 4
+    nhead: 12
+    activation: relu
+
+optimizer_attributes:
+  lr_scheduler:
+    type: "step"
+    decay_at_iteration: 7000
+    decay_factor: 0.1
+  params:
+    eps: 1.0e-08
+    lr: 1e-4
+    weight_decay: 0
+  type: Adam
+training_parameters:
+  epochs: 26
+  batch_size: 64
+  iteration: 9000
+
+
+    

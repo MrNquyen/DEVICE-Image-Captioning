@@ -90,19 +90,7 @@ class SaVOExtractor(nn.Module):
         embed_voc = self.LayerNorm_voc(self.linear_voc(top_K_fasttext_embeddings))
         embed_score = self.LayerNorm_score(self.linear_score(top_K_similarities))
         visual_concept_embedding = embed_voc + embed_score
-        return top_K_fasttext_embeddings, visual_concept_embedding
-
-
-
-
-
-
-
-
-
-
-
         
-
-
-
+        # FT(a_k_voc ), x_k_voc
+        # BS, k, 300 - BS, k, hidden_size 
+        return top_K_fasttext_embeddings, visual_concept_embedding

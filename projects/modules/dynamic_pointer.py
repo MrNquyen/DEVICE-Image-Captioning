@@ -13,6 +13,12 @@ class DynamicPointerNetwork(nn.Module):
         self.hidden_size = hidden_size
 
         #-- Layer
+        self.linear_voc_embedding = nn.Linear(
+            in_features=hidden_size,
+            out_features=hidden_size,
+            bias=True
+        )
+
         self.linear_ocr_embedding = nn.Linear(
             in_features=hidden_size,
             out_features=hidden_size,

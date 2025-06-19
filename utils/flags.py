@@ -17,5 +17,17 @@ class Flags:
         )
 
         self.parser.add_argument(
+            "--run_type", type=str, default="train", help="Which run type you prefer ['train', 'test']"
+        )
+
+        self.parser.add_argument(
+            "--save_dir", type=str, default=None, help="Where to save the model"
+        )
+
+        self.parser.add_argument(
+            "--resume_file", type=str, default=None, help="Model file to resume training or testing"
+        )
+
+        self.parser.add_argument(
             "--device", type=str, default="", help="Set device"
         )

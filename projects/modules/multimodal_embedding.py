@@ -7,6 +7,7 @@ from projects.modules.depth_enhance_update import DeFUM
 from projects.modules.semantic_guide_alignment import SgAM
 from utils.module_utils import fasttext_embedding_module
 from utils.phoc.build_phoc import build_phoc
+from utils.vocab import PretrainedVocab, OCRVocab
 
 
 #----------SYNC INPUT DIM----------
@@ -30,12 +31,57 @@ class Sync(nn.Module):
 
 
 #----------Word embedding----------
-class WordEmbedding(nn.Module):
-    def __init__(self, vocab_path):
-        super().__init__()
+class WordEmbedding:
+    def __init__(self, model, tokenizer, text_embedding_config):
+        self.model = model
+        self.tokenizer = tokenizer  
+        self.config = text_embedding_config
+        self.max_length = self.config["max_length"]
 
-    def forward(self):
-        NotImplemented
+        vocab_path =self. config["common_vocab"]
+        self.common_vocab = PretrainedVocab(
+            model=self.model,
+            tokenizer=self.tokenizer,
+            vocab_file=vocab_path
+        )
+        
+    def get_prev_inds(self, sentences, ocr_tokens):
+        """
+            Use to get inds of each token of the caption sentences
+
+            Parameters:
+            ----------
+            sentences: List[str]
+                - Caption of the images
+            
+            ocr_tokens: List[List[str]]
+
+            Return:
+            ----------
+            prev_ids: Tensor:
+                - All inds of all word in the sentences 
+        """
+        ocr_vocab_object = OCRVocab(ocr_tokens=ocr_tokens)
+
+        start_token = self.common_vocab.get_start_token()
+        end_token = self.common_vocab.get_end_token()
+        sentences_tokens = [
+            [start_token] + sentence.split(" ")[:self.max_length] + [end_token]
+            for sentence in sentences
+        ]
+
+        # Get prev_inds
+        prev_ids = [
+            [
+                self.common_vocab.get_size() + ocr_vocab_object[sen_id].get_idx_word[token]
+                if token in ocr_tokens[sen_id]
+                else ocr_vocab_object[sen_id].get_idx_word[token]
+                for token in sentence_tokens
+            ] 
+            for sen_id, sentence_tokens in enumerate(sentences_tokens)
+        ]
+        return torch.tensor(prev_ids)
+
 
 
 
@@ -107,8 +153,8 @@ class ObjEmbedding(BaseEmbedding):
         boxes_3d = self.concat_depth_value(list_image_id, boxes)
         layer_norm_feat = self.LayerNorm(self.linear_feat(obj_feats))
         layer_norm_boxes = self.LayerNorm(self.linear_boxes(boxes_3d))
-        obj_embedding = layer_norm_feat + layer_norm_boxes
-        return obj_embedding
+        obj_embed = layer_norm_feat + layer_norm_boxes
+        return obj_embed
 
 
 #----------Embedding OBJ----------
@@ -150,7 +196,6 @@ class OCREmbedding(BaseEmbedding):
         self.LayerNorm = nn.LayerNorm(normalized_shape=self.hidden_size)
         
         # Modules
-        self.object_embedding = ObjEmbedding(config=config, device=device)
         self.DeFUM = DeFUM(self.hidden_size)
         self.SgAM = SgAM(
             model_clip=model_clip,
@@ -220,7 +265,7 @@ class OCREmbedding(BaseEmbedding):
         )
 
         # -- SgAM
-        semantic_representation_ocr_tokens, visual_concept_embedding = self.SgAM(
+        semantic_representation_ocr_tokens, visual_concept_embed = self.SgAM(
             image_ids=list_image_id, 
             image_dir=self.image_dir, 
             ocr_tokens=ocr_tokens
@@ -228,7 +273,7 @@ class OCREmbedding(BaseEmbedding):
 
         # -- OCR embedding
         # BS, num_ocr, hidden_size
-        ocr_embedding = self.LayerNorm(
+        ocr_embed = self.LayerNorm(
             self.linear_out_defum(depth_enhance_ocr_appearance) + \
             self.linear_out_sgam(semantic_representation_ocr_tokens) + \
             self.linear_out_phoc(ocr_phoc_embedding)
@@ -237,5 +282,6 @@ class OCREmbedding(BaseEmbedding):
             self.linear_out_ocr_boxes(ocr_boxes) + \
             self.linear_out_ocr_conf(ocr_conf)
         )
-        return ocr_embedding, semantic_representation_ocr_tokens, visual_concept_embedding
+        # x_ocr, x_ft', x_k_voc
+        return ocr_embed, semantic_representation_ocr_tokens, visual_concept_embed
      

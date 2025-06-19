@@ -1,62 +1,14 @@
-## Base on paper description: Iterative Answer Prediction with Pointer-Augmented Multimodal Transformers for TextVQA
 
 import torch
 import torch.nn.functional as F
 from torch import nn
+from typing import List
 import math
 
 from utils.module_utils import _batch_gather, _get_causal_mask
-
-# Base Model
-class MultimodalTransformer(nn.Module):
-    def __init__(self, hidden_size, mutimodal_transformer_config):
-        super().__init__()
-        self.hidden_size = hidden_size
-        self.mutimodal_transformer_config = mutimodal_transformer_config
-        self.max_length = mutimodal_transformer_config["max_length"]
-
-    def forward():
-        NotImplemented
-        
-
-# -- Multimodal Transformer Encoder
-class MultimodalTransformerEncoder(MultimodalTransformer):
-    def __init__(self, hidden_size, mutimodal_transformer_config):
-        super().__init__(self, hidden_size, mutimodal_transformer_config)
-        encoder_layer = nn.TransformerEncoderLayer(
-            d_model=hidden_size,
-            nhead=mutimodal_transformer_config["nhead"],
-            activation=mutimodal_transformer_config["activation"],
-            batch_first=True,
-        )
-        self.transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=mutimodal_transformer_config["num_layers"])
-        
-
-
-    def forward(
-            self, 
-            obj_embedding,
-            ocr_embedding,
-            semantic_representation_ocr_tokens, 
-            visual_concept_embedding,
-        ):
-        """
-            :params obj_embedding:                      BS, num_obj, hidden_size
-            :params ocr_embedding:                      BS, num_ocr, hidden_size
-            :params semantic_representation_ocr_tokens: BS, num_ocr, hidden_size 
-            :params visual_concept_embedding:           BS, top_K, hidden_size
-            :params prev_word_embedding:                BS, hidden_size
-        """
-        concat_feature_embedding = torch.concat([
-            obj_embedding,
-            ocr_embedding,
-            semantic_representation_ocr_tokens,
-            visual_concept_embedding
-        ], dim=1)
-        encoder_output = self.transformer_encoder(concat_feature_embedding)
-        # BS, num_obj + num_ocr + num_ocr + top_K, hidden_size 
-        return encoder_output
-
+from utils.utils import load_vocab
+from projects.modules.multimodal_embedding import WordEmbedding, ObjEmbedding, OCREmbedding
+from transformers import RobertaPreTrainedModel
 
 # -- Previous Embedding
 class PrevEmbedding(nn.Module):
@@ -100,12 +52,12 @@ class PrevEmbedding(nn.Module):
             self,
             common_voc_embedding,
             ocr_embedding,
-            prev_ids
+            prev_inds
         ):
         """
             :params common_voc_embedding    :  common_vocab_len, hidden_size:   All embedding of common vocab
             :params ocr_embedding           :  BS, num_ocr, hidden_size     :   All ocr embedding
-            :params prev_ids                :  BS, list_prev_idx_in_vocab   :   All idx in vocab of prev word in 
+            :params prev_inds                :  BS, list_prev_idx_in_vocab   :   All idx in vocab of prev word in 
             ----
             Note:
                 - Idx of ocr token start from: vocab_len + 1
@@ -116,8 +68,8 @@ class PrevEmbedding(nn.Module):
                 - Lookup table embed position, and get prev embeded vector
         """
         # -- Params
-        batch_size = prev_ids.shape[0]
-        current_seq_length = prev_ids.shape[1]
+        batch_size = prev_inds.shape[0]
+        current_seq_length = prev_inds.shape[1]
         vocab_size = common_voc_embedding.shape[0]
         ocr_size = ocr_embedding.shape[1]
 
@@ -134,7 +86,7 @@ class PrevEmbedding(nn.Module):
 
         last_word_embeddings = _batch_gather(
             x=look_up_table_embedding, 
-            inds=prev_ids
+            inds=prev_inds
         )
 
         # -- Position 
@@ -161,73 +113,151 @@ class PrevEmbedding(nn.Module):
 
 
 
-class MultimodalTransformerDecoder(MultimodalTransformer):
-    def __init__(self, hidden_size, mutimodal_transformer_config):
-        super().__init__(hidden_size, mutimodal_transformer_config)
+# ---------- Encoder as Decoder
+class EncoderAsDecoder(RobertaPreTrainedModel):
+    def __init__(self, pretrained_model, config, **kwargs):
+        """
+            Parameters:
+            ----------
+                **kwargs:
+                    - num_vocab
+
+        """
+        super().__init__(config)
+        self.pretrained_model = pretrained_model
+        self.encoder = self.pretrained_model.encoder
+        self.config = config
+        self.kwargs = kwargs
+    
+    def build(self):
+        self.load_pretrained()
+        self.build_layers()
+
+
+    def build_layers(self):
+        # Prev Embedding
         self.prev_embedding = PrevEmbedding(
-            hidden_size=hidden_size, 
-            mutimodal_transformer_config=mutimodal_transformer_config
+            hidden_size=self.config["hidden_size"],
+            mutimodal_transformer_config=self.config["mutimodal_transformer"]
         )
+
 
     def forward(
             self,
-            encoder_input_embed,
-            encoder_input_mask,
-            ocr_emb,
-            common_voc_emb,
+            obj_embed,
+            obj_mask,
+            ocr_embed,
+            ocr_mask,
+            ocr_semantic_embed,
+            visual_concept_embed,
+            common_vocab_embed,
             prev_inds
         ):
-        
-        prev_embed = self.prev_embedding(
-            common_voc_embedding=common_voc_emb,
-            ocr_embedding=ocr_emb,
-            prev_ids=prev_inds,
+        """
+            Forward batch through a model
+            Parameters:
+            ----------
+                obj_embed: Tensor((BS, num_obj, hidden_size)) 
+                    Obj features embedding 
+                obj_mask: 
+                    Mask of obj objects
+                ocr_embed: Tensor((BS, num_ocr, hidden_size))
+                    Ocr features embedding
+                ocr_mask: Tensor((BS, num_ocr))
+                    Mask of ocr tokens
+                ocr_semantic_embed: Tensor((BS, num_ocr, 300))
+                    Output of SgAM module
+                visual_concept_embed: Tensor((BS, topK, hidden_size))
+                    Output of SgAM module
+                common_vocab_embed: Tensor((len_vocab, embed_dim))
+                    Embed vectors of vocabs
+                prev_inds: 
+                    Previous inds
+        """
+        #-- Decoder Embedding
+            #~ prev_embed is the lookup embedding of previous words
+            #~~%% Training: prev_embed is all the word in the captions
+            #~~%% Testing: prev_embed is only the previous word
+        prev_embed = self.prev_embededding(
+            common_voc_embedding=common_vocab_embed,
+            ocr_embedding=ocr_embed,
+            prev_inds=prev_inds
         )
 
-        # a zero mask for decoding steps, so the encoding steps elements can't
-        # attend to decoding steps.
-        # A triangular causal mask will be filled for the decoding steps
-        # later in extended_attention_mask
-
-        # BS, num_gt_token (input all the gt caption to decoder)
-        attention_mask = torch.zeros(
+        dec_mask = torch.zeros(
             prev_embed.size(0),
             prev_embed.size(1),
             dtype=torch.float32,
             device=prev_embed.device
         )
 
-        # Concat encoder_embed + prev_embed
+        # -- Encoder for stage t
         encoder_inputs = torch.cat(
-            [encoder_input_embed, prev_embed],
+            [obj_embed, ocr_embed, ocr_semantic_embed, visual_concept_embed, prev_embed],
             dim=1
         )
 
-        # Concat encoder_embed_mask + prev_embed_mask
-        encoder_inputs_mask = torch.cat(
-            [encoder_input_mask, attention_mask],
+        # -- Attention_masks
+            #~ ocr_semantic_mask = ocr_mask
+            #~ Shape: BS, num_obj + num_ocr * 2 + k + max_length
+        visual_concept_mask = torch.ones(
+            visual_concept_embed.size(0),
+            visual_concept_embed.size(1),
+            dtype=torch.float32,
+            device=visual_concept_mask.device
+        )
+        attention_mask = torch.cat(
+            [obj_mask, ocr_mask, ocr_mask, visual_concept_mask, dec_mask],
             dim=1
         )
 
-        # Offsets of each modality in the joint embedding space
+        #-- Offsets of each modality in the joint embedding space
         encoder_input_begin = 0
-        encoder_input_embed_end = encoder_input_begin + encoder_input_embed.size(1)
+        ocr_begin = encoder_input_begin + obj_embed.size(1)
+        ocr_end = ocr_begin + ocr_embed.size(1)
+        encoder_input_embed_end = ocr_end + ocr_semantic_embed.size(1) + visual_concept_embed.size(1)
         dec_input_begin = encoder_input_embed_end + 1
         dec_input_end = dec_input_begin + prev_embed.size(1)
 
-        # Multihead broadcasting
+        #-- Multihead broadcasting
         end_when_reach_maxlen = attention_mask.size(1) # 
         extended_attention_mask = attention_mask.unsqueeze(1).unsqueeze(2)
         extended_attention_mask = extended_attention_mask.repeat(
             1, 1, end_when_reach_maxlen, 1
         )
 
-        # Casual masking for multihead broadcasting
-        # Start Casual masking at start of dec_input 
-        extended_attention_mask[:, :, dec_input_end:, dec_input_end:] = \
+        #-- Casual masking for multihead broadcasting
+            #~ Start Casual masking at start of dec_input 
+        extended_attention_mask[:, :, dec_input_begin:, dec_input_begin:] = \
             _get_causal_mask(dec_input_end - dec_input_begin, encoder_inputs.device)
         
-        # Valid attention has value 0 - invalid -inf
+        #-- Valid attention has value 0 - invalid -inf
         extended_attention_mask = (1.0 - extended_attention_mask) * -10000.0
+        
+        #-- Disable grad
+        assert not extended_attention_mask.requires_grad
+        head_mask = [None] * self.config["num_layers"]
 
-        NotImplemented
+        # -- Pass forward encoder
+            #~ encoder_outputs is a tuple (or BaseModelOutput):
+            #~~%%   encoder_outputs[0] == last_hidden_states
+            #~~%%   encoder_outputs[1] == (optional) all_hidden_states
+            #~~%%   encoder_outputs[2] == (optional) all_attentions
+        encoder_outputs = self.encoder(
+            encoder_inputs,
+            extended_attention_mask,
+            head_mask=head_mask
+        )
+
+        mmt_seq_output = encoder_outputs[0]
+        mmt_ocr_output = mmt_seq_output[:, ocr_begin:ocr_end]
+        mmt_dec_output = mmt_seq_output[:, dec_input_begin:]
+
+        results = {
+            'mmt_seq_output': mmt_seq_output,
+            'mmt_ocr_output': mmt_ocr_output,
+            'mmt_dec_output': mmt_dec_output,
+        }
+        return results
+        
+        

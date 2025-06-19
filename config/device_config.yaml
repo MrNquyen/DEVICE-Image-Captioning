@@ -1,3 +1,4 @@
+
 dataset_attributes:
   image_features:
     train:
@@ -14,30 +15,32 @@ dataset_attributes:
     test:
     - 
 model_attributes:
+  model_clip: openai/clip-vit-large-patch14
+  fasttext_bin: vi.bin
+  model_decoder: "/vinai/phobert-base"
   hidden_size: 768
-  ocr_feat_dim: 256
-  obj_feat_dim: 1024
-  feature_dim: 2048
+  ocr:
+    dim: 256
+    num_ocr: 100
+  obj:
+    dim: 1024
+    num_obj: 100
+  feature_dim: 2048 # d
   defum:
     num_layers: 100 # Num obj features
     activation: relu
     nhead: 1
-  mutimodal_transformer_encoder:
+  mutimodal_transformer:
     num_layers: 4
     nhead: 12
-    activation: relu
-  mutimodal_transformer_decoder:
-    vocab: ./data/vocab.txt
     max_length: 30
-    num_layers: 4
-    nhead: 12
-    activation: relu
+  text_embedding:
+    common_vocab: ./data/vocab.txt
+    max_length: 30
+    return_tensors: pt
 
 optimizer_attributes:
-  lr_scheduler:
-    type: "step"
-    decay_at_iteration: 7000
-    decay_factor: 0.1
+  lr_scale: 0.1 # scale lr for finetuning modules
   params:
     eps: 1.0e-08
     lr: 1e-4
@@ -46,7 +49,24 @@ optimizer_attributes:
 training_parameters:
   epochs: 26
   batch_size: 64
-  iteration: 9000
+  iterations: 9000
+  lr_scheduler:
+    status: true
+    type: "step"
+    step_size: 7000
+    gamma : 0.1
+  lr_steps:
+    - 6000
+    - 10000
+  lr_ratio: 0.1
+  use_warmup: true
+  warmup_factor: 0.2
+  warmup_iterations: 1000
+  max_iterations: 12000
+  snapshot_interval: 500
+  monitored_metric: m4c_textcaps/textcaps_bleu4
+  metric_minimize: false
+  seed: 2021
 
 
     

@@ -295,7 +295,7 @@ class DEVICE(BaseModel):
                 sentences=batch["list_captions"],
                 ocr_tokens=batch["list_ocr_tokens"]
             )
-            results = self._forward_mmt(
+            results = self.forward_mmt(
                 obj_embed=obj_embed,
                 obj_mask=batch["obj_mask"],
                 ocr_embed=ocr_embed,
@@ -305,7 +305,7 @@ class DEVICE(BaseModel):
                 common_vocab_embed=common_vocab_embed,
                 prev_inds=prev_inds
             )
-            scores = self._forward_output(results)
+            scores = self.forward_output(results)
         else:
             num_dec_step = self.word_embedding.max_length
             # Init prev_ids with <s> idx at begin, else where with <pad> (at idx 0)
@@ -317,7 +317,7 @@ class DEVICE(BaseModel):
             prev_inds[:, 0] = start_idx
             scores = None
             for i in range(num_dec_step):
-                results = self._forward_mmt(
+                results = self.forward_mmt(
                     obj_embed=obj_embed,
                     obj_mask=batch["obj_mask"],
                     ocr_embed=ocr_embed,
@@ -327,7 +327,7 @@ class DEVICE(BaseModel):
                     common_vocab_embed=common_vocab_embed,
                     prev_inds=prev_inds
                 )
-                scores = self._forward_output(results)
+                scores = self.forward_output(results)
                 argmax_inds = scores.argmax(dim=-1)
                 prev_inds = argmax_inds[:, :-1]
             return scores

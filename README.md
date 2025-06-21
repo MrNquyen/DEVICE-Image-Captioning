@@ -3,7 +3,7 @@
 ## **Data Preparation**
 - Object Features: Extract FasterRCNN
 - OCR Features: Extract SwinTextSpotter
-- BTS: Extract via [marigold-depth-v1-0](https://huggingface.co/prs-eth/marigold-depth-v1-0)
+- Depth Estimation: Extract via [marigold-depth-v1-0](https://huggingface.co/prs-eth/marigold-depth-v1-0)
 
 ## Update Modules
 ```

@@ -1,5 +1,6 @@
 import numpy as np
-
+import os
+print(os.getcwd())
 from utils.phoc.src.cphoc import build_phoc as _build_phoc_raw
 
 

@@ -10,7 +10,7 @@ from projects.modules.multimodal_embedding import ObjEmbedding, OCREmbedding, Sy
 from projects.modules.decoder import EncoderAsDecoder 
 from utils.configs import Config
 from utils.module_utils import _batch_padding, _batch_padding_string
-from transformers import AutoTokenizer, AutoModel, AutoConfig, RobertaPreTrainedModel
+from transformers import AutoTokenizer, AutoModel, AutoConfig
 
 
 #---------- DYNAMIC POINTER NETWORK ----------
@@ -36,7 +36,7 @@ class BaseModel(nn.Module):
         super().__init__()
         self.config = config
         self.device = device
-        self.hidden_size = self.config.config_model["hidden_size"]
+        self.hidden_size = self.config["hidden_size"]
         self.build_model_init()
 
 
@@ -64,28 +64,39 @@ class BaseModel(nn.Module):
 
 #---------- DEVICE MODEL ----------
 class DEVICE(BaseModel):
-    def __init__(self, config, device):
+    def __init__(self, config, device, **kwargs):
         """
             :params config: Model Config
             :params device: device cuda
         """
         super().__init__(config, device)
+        self.kwargs = kwargs
+        self.writer = kwargs["writer"]
         self.build()
 
 
     #---- BUILD
     def build(self):
+        self.writer.LOG_INFO("=== Build model params ===")
         self.build_model_params()
+
+        self.writer.LOG_INFO("=== Build model layers ===")
         self.build_layers()
+
+        self.writer.LOG_INFO("=== Build model sync ===")
         self.build_sync()
+
+        self.writer.LOG_INFO("=== Build model pretrained ===")
         self.load_pretrained()
+
+        self.writer.LOG_INFO("=== Build model output ===")
         self.build_ouput()
 
     def build_model_params(self):
         self.ocr_config = self.config["ocr"]
         self.obj_config = self.config["obj"]
         self.num_ocr, self.num_obj = self.ocr_config["num_ocr"], self.obj_config["num_obj"]
-        self.dim_ocr, self.dim_obj = self.ocr_config["dim_ocr"], self.obj_config["dim_obj"]
+        self.dim_ocr, self.dim_obj = self.ocr_config["dim"], self.obj_config["dim"]
         self.feature_dim = self.config["feature_dim"]
 
     def build_sync(self):
@@ -109,9 +120,11 @@ class DEVICE(BaseModel):
         # OCR Embedding
         self.ocr_embedding = OCREmbedding(
             model_clip=self.model_clip,
+            fasttext_model=self.fasttext_model,
             processor_clip=self.processor_clip,
             config=self.config,
-            device=self.device
+            device=self.device,
+            image_dir=self.config["image_dir"] # kwargs
         )
 
         # Word Embedding

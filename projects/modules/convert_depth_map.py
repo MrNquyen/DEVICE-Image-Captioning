@@ -8,19 +8,19 @@ from collections import Counter
 
 # https://github.com/Westlake-AGI-Lab/Distill-Any-Depth
 class DepthExtractor():
-    def __init__(self, depth_map_dir):
-        list_depth_map_name = os.listdir(depth_map_dir)
-        list_depth_map_path = [os.path.join(depth_map_dir, depth_map_name) for depth_map_name in list_depth_map_name]
+    def __init__(self, depth_images_dir):
+        list_depth_map_name = os.listdir(depth_images_dir)
+        list_depth_map_path = [os.path.join(depth_images_dir, depth_map_name) for depth_map_name in list_depth_map_name]
         
         #-- id2depthmap
         self.data = {
-            get_img_name(name): np.array(Image.open(depth_map_path))
+            get_img_name(name): np.array(Image.open(depth_map_path))[0]
             for name, depth_map_path in zip(list_depth_map_name, list_depth_map_path)
         }
 
     def get_depth_value(self, image_id, box):
         image = self.data[image_id]
-        height, width, _ = image.shape
+        height, width = image.shape
         
         # Load norm coordinate
         xmin_norm, ymin_norm, xmax_norm, ymax_norm = box

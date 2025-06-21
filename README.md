@@ -3,20 +3,59 @@
 ## **Data Preparation**
 - Object Features: Extract FasterRCNN
 - OCR Features: Extract SwinTextSpotter
-- BTS: Extract via [model](https://github.com/Xt-Chen/SARPN?tab=readme-ov-file)
+- BTS: Extract via [marigold-depth-v1-0](https://huggingface.co/prs-eth/marigold-depth-v1-0)
 
 ## Update Modules
 ```
   Completed
 ```
 
-## Training
+## Depth Estimation
+Using marigold-depth-v1-0
 ```
-  Not Implemented - In Progress
+  python ./tools/extract_depth.py
 ```
 
-## Evaluation
+## Setup
+Setup model using
 ```
-  Not Implemented - In Progress
+  ./scripts/setup.sh
 ```
+
+Or:
+```
+  python setup.py build_ext --inplace
+```
+
+## Training
+Training on your own dataset:
+```
+  ./scripts/train.sh
+```
+
+Or:
+```
+  python main.py \
+    --config ./config/device_config.yaml \
+    --save_dir ./save \
+    --run_type train \
+    --device 7
+```
+
+## Testing 
+Testing on trained model:
+```
+  ./scripts/test.sh
+```
+
+Or:
+```
+  python tools/run.py \
+    --config ./config/device_config.yaml \
+    --save_dir ./save \
+    --run_type inference\
+    --device 7
+    --resume_file your/ckpt/path
+```
+
 

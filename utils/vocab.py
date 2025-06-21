@@ -1,10 +1,7 @@
 import torch
 from collections import defaultdict
 from torch import nn
-from torchtext import vocab
-from transformers import AutoModel, AutoTokenizer
 from utils.utils import load_vocab
-
 
 # Use to training tokenizer from scratch
 class BaseVocab(nn.Module):

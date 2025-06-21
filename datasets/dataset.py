@@ -10,7 +10,7 @@ from utils.utils import load_json, load_npy
 class ViInforgraphicDataset(Dataset):
     def __init__(self, dataset_config, split):
         super().__init__()
-        ocr_feat_dir, obj_feat_dir = dataset_config["imdb_files"].split(", ")
+        ocr_feat_dir, obj_feat_dir = dataset_config["image_features"].split(", ")
         
         imdb_path = dataset_config["imdb_files"][split]
         imdb = load_json(imdb_path)

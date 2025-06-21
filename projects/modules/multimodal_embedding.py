@@ -88,10 +88,11 @@ class WordEmbedding:
 #----------Embedding----------
 class BaseEmbedding(nn.Module):
     def __init__(self, config, device):
+        super().__init__()
         self.hidden_size = config["hidden_size"]
         self.common_dim = config["feature_dim"]
         
-        self.depth_extractor = DepthExtractor(depth_map_dir=config["depth_map_dir"])
+        self.depth_extractor = DepthExtractor(depth_images_dir=config["depth_images_dir"])
         self.LayerNorm = nn.LayerNorm(normalized_shape=self.hidden_size)
 
 
@@ -196,7 +197,10 @@ class OCREmbedding(BaseEmbedding):
         self.LayerNorm = nn.LayerNorm(normalized_shape=self.hidden_size)
         
         # Modules
-        self.DeFUM = DeFUM(self.hidden_size)
+        self.DeFUM = DeFUM(
+            hidden_size=self.hidden_size,
+            defum_config=self.config["defum"]
+        )
         self.SgAM = SgAM(
             model_clip=model_clip,
             processor_clip=processor_clip,

@@ -2,22 +2,26 @@
 dataset_attributes:
   image_features:
     train:
-    - 
+    - /data/npl/ViInfographicCaps/features/swintextspotter, /data/npl/ViInfographicCaps/features/faster_rcnn/features
     val:
-    - 
+    - /data/npl/ViInfographicCaps/features/swintextspotter, /data/npl/ViInfographicCaps/features/faster_rcnn/features
     test:
+    - /data/npl/ViInfographicCaps/features/swintextspotter, /data/npl/ViInfographicCaps/features/faster_rcnn/features
     # - open_images/detectron_fix_100/fc6/test,m4c_textvqa_ocr_en_frcn_features/test_images
   imdb_files:
     train:
-    - 
+    - /data/npl/ViInfographicCaps/data/train_imdb.npy
     val:
-    -   
+    - /data/npl/ViInfographicCaps/data/val_imdb.npy
     test:
-    - 
+    - /data/npl/ViInfographicCaps/data/test_imdb.npy
 model_attributes:
-  model_clip: openai/clip-vit-large-patch14
-  fasttext_bin: vi.bin
-  model_decoder: "/vinai/phobert-base"
+  image_dir: /data/npl/ViInfographicCaps/images/images
+  model_clip: /data/npl/ViInfographicCaps/hf_model/clip-vit-large-patch14
+  fasttext_bin: ./utils/fasttext/wiki.vi.bin
+  depth_images_dir: /data/npl/ViInfographicCaps/features/depth_images
+  # fasttext_bin: utils/fasttext/wiki.vi.bin
+  model_decoder: /data/npl/ViInfographicCaps/hf_model/phobert-base
   hidden_size: 768
   ocr:
     dim: 256

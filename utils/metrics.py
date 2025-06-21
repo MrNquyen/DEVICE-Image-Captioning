@@ -1,7 +1,7 @@
-from pycocoevalcap.bleu.bleu import Bleu
-from pycocoevalcap.rouge.rouge import Rouge
-from pycocoevalcap.cider.cider import Cider
-from pycocoevalcap.meteor.meteor import Meteor
+from utils.pycocoevalcap.bleu.bleu import Bleu
+from utils.pycocoevalcap.rouge.rouge import Rouge
+from utils.pycocoevalcap.cider.cider import Cider
+from utils.pycocoevalcap.meteor.meteor import Meteor
 
 
 def metric_calculate(ref, hypo):

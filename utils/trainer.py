@@ -18,14 +18,17 @@ from utils.utils import save_json
 
 # ~Trainer~
 class Trainer():
-    def __init__(self, config, args, run_type):
+    def __init__(self, config, args):
         self.args = args
+        self.device = args.device
         self.config = Config(config)
-        self.run_type = run_type
-        self.model = DEVICE(self.config.config_model)
-        self.writer = Logger()
-        self.writer_evaluation = Logger()
-        self.writer_inference = Logger()
+
+        print("Build Logger")
+        self.writer = Logger(name="all")
+        self.writer_evaluation = Logger(name="evaluation")
+        self.writer_inference = Logger(name="inference")
+        
+        self.build()
 
     #---- LOAD TASK
     def load_task(self):
@@ -35,6 +38,19 @@ class Trainer():
         self.test_loader = get_loader(dataset_config=self.config.config_dataset, batch_size=batch_size, split="test")
 
     #---- BUILD
+    def build(self):
+        self.writer.LOG_INFO("=== START BUILDING ===")
+        self.build_model()
+        self.build_training_params()
+
+    def build_model(self):
+        self.model = DEVICE(
+            config=self.config.config_model, 
+            device=self.device, 
+            writer=self.writer # kwargs
+        )
+
+
     def build_training_params(self):
         self.max_epochs = self.config.config_training["epochs"]
         self.batch_size = self.config.config_training["batch_size"]

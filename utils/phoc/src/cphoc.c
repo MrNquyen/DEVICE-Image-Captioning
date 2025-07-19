@@ -24,8 +24,28 @@ static PyObject *build_phoc(PyObject *self, PyObject *args)
 
     int index, level, region, i, k, l;
 
-    char *unigrams[36] = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
-    char *bigrams[50] = {"th", "he", "in", "er", "an", "re", "es", "on", "st", "nt", "en", "at", "ed", "nd", "to", "or", "ea", "ti", "ar", "te", "ng", "al", "it", "as", "is", "ha", "et", "se", "ou", "of", "le", "sa", "ve", "ro", "ra", "ri", "hi", "ne", "me", "de", "co", "ta", "ec", "si", "ll", "so", "na", "li", "la", "el"};
+    // char *unigrams[36] = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+    char *unigrams[] = {
+        "a","ă","â","b","c","d","đ","e","ê","f","g","h","i","j","k",
+        "l","m","n","o","ô","ơ","p","q","r","s","t","u","ư","v","w","x","y","z",
+        "á","ắ","ấ","é","ế","í","ó","ố","ớ","ú","ứ","ý",
+        "à","ằ","ầ","è","ề","ì","ò","ồ","ờ","ù","ừ","ỳ",
+        "ả","ẳ","ẩ","ẻ","ể","ỉ","ỏ","ổ","ở","ủ","ử","ỷ",
+        "ã","ẵ","ẫ","ẽ","ễ","ĩ","õ","ỗ","ỡ","ũ","ữ","ỹ",
+        "ạ","ặ","ậ","ẹ","ệ","ị","ọ","ộ","ợ","ụ","ự","ỵ",
+        "0","1","2","3","4","5","6","7","8","9"
+    };
+    int N_UNIGRAMS = sizeof(unigrams) / sizeof(unigrams[0]);
+    // char *bigrams[50] = {"th", "he", "in", "er", "an", "re", "es", "on", "st", "nt", "en", "at", "ed", "nd", "to", "or", "ea", "ti", "ar", "te", "ng", "al", "it", "as", "is", "ha", "et", "se", "ou", "of", "le", "sa", "ve", "ro", "ra", "ri", "hi", "ne", "me", "de", "co", "ta", "ec", "si", "ll", "so", "na", "li", "la", "el"};
+    char *bigrams[] = {
+        "ng", "th", "ch", "nh", "tr", "qu", "gi", "ph", "kh", "gh",
+        "ai", "ao", "au", "ay", "eo", "eu", "ia", "ie", "iu", 
+        "oa", "oe", "oi", "ua", "ue", "ui",
+        "an", "em", "in", "on", "oc", "uc", "at", "en", "es", "el", 
+        "al", "ol", "ul", "il", "im", "um", "om", "up", "ap", "êt", 
+        "ăm", "ắn", "ơn", "ươ", "ưa", "uâ"
+    } 
+    int N_BIGRAMS = sizeof(bigrams) / sizeof(bigrams[0]);
 
     int n = strlen(word);
     for (index = 0; index < n; index++)
@@ -33,7 +53,7 @@ static PyObject *build_phoc(PyObject *self, PyObject *args)
         float char_occ0 = (float)index / (float)n;
         float char_occ1 = (float)(index + 1) / (float)n;
         int char_index = -1;
-        for (k = 0; k < 36; k++)
+        for (k = 0; k < N_UNIGRAMS; k++)
         {
             if (memcmp(unigrams[k], word + index, 1) == 0)
             {
@@ -43,9 +63,16 @@ static PyObject *build_phoc(PyObject *self, PyObject *args)
         }
         if (char_index == -1)
         {
-            char error_msg[50];
-            sprintf(error_msg, "Error: unigram %c is unknown", *(word + index));
-            return PyErr_Format(PyExc_RuntimeError, error_msg);
+            // char error_msg[50];
+            // sprintf(error_msg, "Error: unigram %c is unknown", *(word + index));
+            // return PyErr_Format(PyExc_RuntimeError, error_msg);
+        
+            return PyErr_Format(
+                PyExc_RuntimeError,
+                "Error building PHOC for token '%s': unknown char '%c'",
+                token,            // may include UTF‑8 bytes
+                *(word + index)   // single-byte codepoint
+            );
         }
         // check unigram levels
         for (level = 2; level < 6; level++)
@@ -75,7 +102,7 @@ static PyObject *build_phoc(PyObject *self, PyObject *args)
     for (i = 0; i < (n - 1); i++)
     {
         int ngram_index = -1;
-        for (k = 0; k < 50; k++)
+        for (k = 0; k < N_BIGRAMS; k++)
         {
             if (memcmp(bigrams[k], word + i, 2) == 0)
             {
@@ -98,7 +125,7 @@ static PyObject *build_phoc(PyObject *self, PyObject *args)
             float overlap1 = min(ngram_occ1, region_occ1);
             if ((overlap1 - overlap0) / (ngram_occ1 - ngram_occ0) >= 0.5)
             {
-                phoc[ngram_offset + region * 50 + ngram_index] = 1;
+                phoc[ngram_offset + region * N_BIGRAMS + ngram_index] = 1;
             }
         }
     }

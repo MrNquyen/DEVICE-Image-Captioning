@@ -2,6 +2,7 @@ import torch
 import math
 import numpy as np
 from torch import nn
+from icecream import ic
 
 class SemanticAttention(nn.Module):
     def __init__(self, input_size):
@@ -42,7 +43,7 @@ class SemanticAttention(nn.Module):
 
 class SemanticAttentionDeFUM(SemanticAttention):
     def __init__(self, hidden_size):
-        super().__init__(self, hidden_size)
+        super().__init__(hidden_size)
 
 
     def forward(self, apperance_embedding):
@@ -62,7 +63,7 @@ class SemanticAttentionDeFUM(SemanticAttention):
 
 class SemanticAttentionSgAM(SemanticAttention):
     def __init__(self, fasttext_dim):
-        super().__init__(self, fasttext_dim)
+        super().__init__(fasttext_dim)
 
 
     def forward(self, fasttext_ocr_tokens, fasttext_object_concepts):

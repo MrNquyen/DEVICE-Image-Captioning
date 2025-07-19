@@ -2,7 +2,7 @@ import numpy as np
 import torch 
 import torch.nn.functional as F
 from typing import List
-
+from icecream import ic
 # Fasttext
 def fasttext_embedding_module(model, word):
     ft_feat = model.get_word_vector(word)
@@ -90,7 +90,7 @@ def _batch_padding_string(
     for seq in sequences:
         seq_len = len(seq)
         # 1) Pad up to max_length
-        padded_seq = seq + [pad_value] * (max_length - seq_len)
+        padded_seq = seq + [pad_value] * max((max_length - seq_len), 0)
         padded.append(padded_seq)
         # 2) Mask: 1 for real tokens, 0 for pads
         if return_mask:
@@ -102,7 +102,7 @@ def _batch_padding_string(
         return padded
 
 
-def _batch_padding(input, max_length, pad_value, return_mask=True):
+def _batch_padding(inputs, max_length, pad_value, return_mask=True):
     """
         Input:
             - List of features with different lengths
@@ -129,18 +129,25 @@ def _batch_padding(input, max_length, pad_value, return_mask=True):
                 [1, 1, 1, 1, 0],
                 [1, 1, 1, 0, 0]]
     """
-    batch_size = len(input)
-    input_length = torch.tensor([len(item) for item in input])
+    batch_size = len(inputs)
+    # ic(input)
+    # for id, item in enumerate(inputs):
+    #     try:
+    #         item_length = item.shape[0]
+    #         ic(id, item_length)
+    #     except:
+    #         ic(item)
+    input_length = torch.tensor([item.shape[0] for item in inputs])
 
     # Create mask
     arange = torch.arange(0, max_length).unsqueeze(0).expand(batch_size, -1)
     
     # Padding
     pad_input = []
-    for item in input:
+    for item in inputs:
         pad_post = pad_value.expand(max_length-len(item), -1)
         item = torch.concat(
-            [item, pad_post],
+            [torch.tensor(item), pad_post],
             dim=0
         )
         pad_input.append(item)

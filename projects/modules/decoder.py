@@ -4,16 +4,17 @@ import torch.nn.functional as F
 from torch import nn
 from typing import List
 import math
+from icecream import ic
 
 from utils.module_utils import _batch_gather, _get_causal_mask
 from utils.utils import load_vocab
 from projects.modules.multimodal_embedding import WordEmbedding, ObjEmbedding, OCREmbedding
-from transformers import RobertaPreTrainedModel
+from transformers import RobertaPreTrainedModel, RobertaConfig
 
 # -- Previous Embedding
 class PrevEmbedding(nn.Module):
     def __init__(self, hidden_size, mutimodal_transformer_config):
-        super().__init__(self, hidden_size, mutimodal_transformer_config)
+        super().__init__()
         self.DEC_LENGTH = mutimodal_transformer_config["max_length"] # Max caption output length
         self.TYPE_NUM = 2 # OCR or FROM_VOCAB
         self.hidden_size = hidden_size
@@ -27,8 +28,9 @@ class PrevEmbedding(nn.Module):
             embedding_dim=hidden_size
         )
         self.common_voc_embedding_norm = nn.LayerNorm(normalized_shape=self.hidden_size)
+        self.emb_layer_norm = nn.LayerNorm(normalized_shape=self.hidden_size)
         self.ocr_embedding_norm = nn.LayerNorm(normalized_shape=self.hidden_size)
-        self.emb_dropout = nn.Dropout(mutimodal_transformer_config.hidden_dropout_prob)
+        self.emb_dropout = nn.Dropout(mutimodal_transformer_config["dropout"])
 
 
     def init_pe_weights(self):
@@ -78,12 +80,14 @@ class PrevEmbedding(nn.Module):
         ocr_embedding = self.ocr_embedding_norm(ocr_embedding)
         assert common_voc_embedding.size(-1) == ocr_embedding.size(-1)
 
-        common_voc_embedding.unsqueeze(0).expand(batch_size, -1, -1)
+        common_voc_embedding = common_voc_embedding.unsqueeze(0).expand(batch_size, -1, -1)
+        # ic(common_voc_embedding.shape, ocr_embedding.shape)
         look_up_table_embedding = torch.concat(
             [common_voc_embedding, ocr_embedding],
             dim=1
         )
 
+        # ic(look_up_table_embedding.device, prev_inds.device)
         last_word_embeddings = _batch_gather(
             x=look_up_table_embedding, 
             inds=prev_inds
@@ -95,6 +99,7 @@ class PrevEmbedding(nn.Module):
             dtype=torch.long,
             device=ocr_embedding.device
         )
+        # ic(position_ids)
         position_ids = position_ids.unsqueeze(0).expand(batch_size, -1)
         position_embeddings = self.positional_embedding(position_ids)
 
@@ -104,6 +109,7 @@ class PrevEmbedding(nn.Module):
 
         # -- Position and token type
         pos_type_embeddings = position_embeddings + token_type_embedddings 
+        # ic(pos_type_embeddings.shape)
         pos_type_embeddings = self.emb_layer_norm(pos_type_embeddings)
         pos_type_embeddings = self.emb_dropout(pos_type_embeddings)
 
@@ -115,7 +121,7 @@ class PrevEmbedding(nn.Module):
 
 # ---------- Encoder as Decoder
 class EncoderAsDecoder(RobertaPreTrainedModel):
-    def __init__(self, pretrained_model, config, **kwargs):
+    def __init__(self, pretrained_model, config, roberta_config, hidden_size, **kwargs):
         """
             Parameters:
             ----------
@@ -123,22 +129,32 @@ class EncoderAsDecoder(RobertaPreTrainedModel):
                     - num_vocab
 
         """
-        super().__init__(config)
+        super().__init__(roberta_config)
         self.pretrained_model = pretrained_model
         self.encoder = self.pretrained_model.encoder
+        self.hidden_size = hidden_size
         self.config = config
         self.kwargs = kwargs
+        # Build
+        self.build()
+
+        # Layer
+        fastext_dim = 300
+        self.ocr_semantic_linear = nn.Linear(
+            in_features=fastext_dim,
+            out_features=hidden_size
+        )
     
     def build(self):
-        self.load_pretrained()
+        # self.load_pretrained()
         self.build_layers()
 
 
     def build_layers(self):
         # Prev Embedding
         self.prev_embedding = PrevEmbedding(
-            hidden_size=self.config["hidden_size"],
-            mutimodal_transformer_config=self.config["mutimodal_transformer"]
+            hidden_size=self.hidden_size,
+            mutimodal_transformer_config=self.config
         )
 
 
@@ -178,7 +194,7 @@ class EncoderAsDecoder(RobertaPreTrainedModel):
             #~ prev_embed is the lookup embedding of previous words
             #~~%% Training: prev_embed is all the word in the captions
             #~~%% Testing: prev_embed is only the previous word
-        prev_embed = self.prev_embededding(
+        prev_embed = self.prev_embedding(
             common_voc_embedding=common_vocab_embed,
             ocr_embedding=ocr_embed,
             prev_inds=prev_inds
@@ -191,7 +207,11 @@ class EncoderAsDecoder(RobertaPreTrainedModel):
             device=prev_embed.device
         )
 
+        # Convert fasttext dim to hidden state dim
+        ocr_semantic_embed = self.ocr_semantic_linear(ocr_semantic_embed)
+
         # -- Encoder for stage t
+        # ic(obj_embed.shape, ocr_embed.shape, ocr_semantic_embed.shape, visual_concept_embed.shape, prev_embed.shape)
         encoder_inputs = torch.cat(
             [obj_embed, ocr_embed, ocr_semantic_embed, visual_concept_embed, prev_embed],
             dim=1
@@ -204,8 +224,9 @@ class EncoderAsDecoder(RobertaPreTrainedModel):
             visual_concept_embed.size(0),
             visual_concept_embed.size(1),
             dtype=torch.float32,
-            device=visual_concept_mask.device
+            device=visual_concept_embed.device
         )
+        # ic(obj_mask.device, ocr_mask.device, ocr_mask.device, visual_concept_mask.device, dec_mask.device)
         attention_mask = torch.cat(
             [obj_mask, ocr_mask, ocr_mask, visual_concept_mask, dec_mask],
             dim=1
@@ -216,8 +237,9 @@ class EncoderAsDecoder(RobertaPreTrainedModel):
         ocr_begin = encoder_input_begin + obj_embed.size(1)
         ocr_end = ocr_begin + ocr_embed.size(1)
         encoder_input_embed_end = ocr_end + ocr_semantic_embed.size(1) + visual_concept_embed.size(1)
-        dec_input_begin = encoder_input_embed_end + 1
+        dec_input_begin = encoder_input_embed_end
         dec_input_end = dec_input_begin + prev_embed.size(1)
+        # ic(dec_input_begin)
 
         #-- Multihead broadcasting
         end_when_reach_maxlen = attention_mask.size(1) # 
@@ -228,6 +250,8 @@ class EncoderAsDecoder(RobertaPreTrainedModel):
 
         #-- Casual masking for multihead broadcasting
             #~ Start Casual masking at start of dec_input 
+        # ic(_get_causal_mask(dec_input_end - dec_input_begin, encoder_inputs.device).shape)
+        # ic(extended_attention_mask.shape)
         extended_attention_mask[:, :, dec_input_begin:, dec_input_begin:] = \
             _get_causal_mask(dec_input_end - dec_input_begin, encoder_inputs.device)
         

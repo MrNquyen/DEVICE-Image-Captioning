@@ -2,13 +2,15 @@ import torch
 from torch import nn
 from typing import List
 
-from projects.modules.convert_depth_map import DepthExtractor
+from projects.modules.convert_depth_map_buffer import DepthExtractor
 from projects.modules.depth_enhance_update import DeFUM
 from projects.modules.semantic_guide_alignment import SgAM
-from utils.module_utils import fasttext_embedding_module
-from utils.phoc.build_phoc import build_phoc
+from utils.module_utils import fasttext_embedding_module, _batch_padding_string
+from utils.phoc.build_phoc_v2 import build_phoc
 from utils.vocab import PretrainedVocab, OCRVocab
-
+from tqdm import tqdm
+from time import time
+from icecream import ic
 
 #----------SYNC INPUT DIM----------
 class Sync(nn.Module):
@@ -31,10 +33,11 @@ class Sync(nn.Module):
 
 
 #----------Word embedding----------
-class WordEmbedding:
+class WordEmbedding(nn.Module):
     def __init__(self, model, tokenizer, text_embedding_config):
+        super().__init__()
         self.model = model
-        self.tokenizer = tokenizer  
+        self.tokenizer = tokenizer
         self.config = text_embedding_config
         self.max_length = self.config["max_length"]
 
@@ -65,17 +68,30 @@ class WordEmbedding:
 
         start_token = self.common_vocab.get_start_token()
         end_token = self.common_vocab.get_end_token()
+        pad_token = self.common_vocab.get_pad_token()
+        
         sentences_tokens = [
-            [start_token] + sentence.split(" ")[:self.max_length] + [end_token]
+            sentence.split(" ")
             for sentence in sentences
+        ]
+        sentences_tokens = _batch_padding_string(
+            sequences=sentences_tokens,
+            max_length=self.config["max_length"],
+            pad_value=pad_token,
+            return_mask=False
+        )
+        sentences_tokens = [
+            [start_token] + sentence_tokens[:self.max_length - 2] + [end_token]
+            for sentence_tokens in sentences_tokens
         ]
 
         # Get prev_inds
         prev_ids = [
             [
-                self.common_vocab.get_size() + ocr_vocab_object[sen_id].get_idx_word[token]
+                self.common_vocab.get_size() + ocr_vocab_object[sen_id].get_word_idx(token)
                 if token in ocr_tokens[sen_id]
-                else ocr_vocab_object[sen_id].get_idx_word[token]
+                # else ocr_vocab_object[sen_id].get_word_idx(token)
+                else self.common_vocab.get_word_idx(token)
                 for token in sentence_tokens
             ] 
             for sen_id, sentence_tokens in enumerate(sentences_tokens)
@@ -89,6 +105,8 @@ class WordEmbedding:
 class BaseEmbedding(nn.Module):
     def __init__(self, config, device):
         super().__init__()
+        self.config = config
+        self.device = device
         self.hidden_size = config["hidden_size"]
         self.common_dim = config["feature_dim"]
         
@@ -102,18 +120,20 @@ class BaseEmbedding(nn.Module):
            :params boxes        :   BS, num_obj, 4  :Batch of image id 
         """
         dv = []
-        for image_id, im_boxes in zip(list_image_id, boxes): # List of image boxes in batch
+        progress = tqdm(zip(list_image_id, boxes), total=len(list_image_id), desc="Processing Depth Images")
+        for image_id, im_boxes in progress:
+            progress.set_postfix(image_id=image_id)    
             dv_i = []
             for im_box in im_boxes: # List of all boxes in image
                 dv_ij = self.depth_extractor.get_depth_value(
                     image_id=image_id,
-                    boxes=im_box
+                    box=im_box
                 )
                 dv_i.append(dv_ij)
             dv.append(dv_i)
         
-        dv = torch.tensor(dv)
-        assert len(dv.shape()) == 3
+        dv = torch.tensor(dv).to(self.device)
+        # assert len(dv.size()) == 3
         return dv
 
 
@@ -122,9 +142,9 @@ class BaseEmbedding(nn.Module):
            :params list_image_id:   BS, 1           :Batch of image id 
            :params boxes        :   BS, num_obj, 4  :Batch of image id 
         """
-        dv = self.cal_depth_value(list_image_id, boxes)
+        dv = self.cal_depth_value(list_image_id, boxes).unsqueeze(-1)
         boxes_3d  = torch.concat([boxes, dv], axis=-1)
-        return boxes_3d 
+        return boxes_3d.to(torch.float32)
     
 
 
@@ -153,7 +173,7 @@ class ObjEmbedding(BaseEmbedding):
         """
         boxes_3d = self.concat_depth_value(list_image_id, boxes)
         layer_norm_feat = self.LayerNorm(self.linear_feat(obj_feats))
-        layer_norm_boxes = self.LayerNorm(self.linear_boxes(boxes_3d))
+        layer_norm_boxes = self.LayerNorm(self.linear_box(boxes_3d))
         obj_embed = layer_norm_feat + layer_norm_boxes
         return obj_embed
 
@@ -178,7 +198,8 @@ class OCREmbedding(BaseEmbedding):
             out_features=self.hidden_size
         )
         
-        phoc_dim = 604
+        # phoc_dim = 604
+        phoc_dim = 1810
         self.linear_out_phoc = nn.Linear(
             in_features=phoc_dim,
             out_features=self.hidden_size
@@ -198,11 +219,12 @@ class OCREmbedding(BaseEmbedding):
         
         # Modules
         self.DeFUM = DeFUM(
-            hidden_size=self.hidden_size,
+            feature_dim=self.config["feature_dim"],
             defum_config=self.config["defum"]
         )
         self.SgAM = SgAM(
             model_clip=model_clip,
+            sgam_config=config["sgam"],
             processor_clip=processor_clip,
             fasttext_model=fasttext_model,
             hidden_size=config["hidden_size"]
@@ -214,7 +236,8 @@ class OCREmbedding(BaseEmbedding):
             :params words:  List of word needed to embedded
         """
         phoc_embedding = [
-            build_phoc(token=word) 
+            # build_phoc(token=word) 
+            build_phoc(word=word) 
             for word in words
         ]
         return torch.tensor(phoc_embedding)
@@ -256,10 +279,6 @@ class OCREmbedding(BaseEmbedding):
         ocr_dvs = self.cal_depth_value(list_image_id, ocr_boxes)
         obj_dvs = self.cal_depth_value(list_image_id, obj_boxes)
         ocr_boxes = self.concat_depth_value(list_image_id=list_image_id, boxes=ocr_boxes)
-        # -- Phoc embedding
-        ocr_phoc_embedding = [self.phoc_embedding(tokens) for tokens in ocr_tokens]
-        ocr_phoc_embedding = torch.tensor(ocr_phoc_embedding)
-        
         # -- Defum
         depth_enhance_ocr_appearance = self.DeFUM(
             ocr_feats=ocr_feats, 
@@ -275,8 +294,16 @@ class OCREmbedding(BaseEmbedding):
             ocr_tokens=ocr_tokens
         )
 
+        # -- Phoc embedding
+        ocr_phoc_embedding = [self.phoc_embedding(tokens) for tokens in ocr_tokens]
+        ocr_phoc_embedding = torch.stack(ocr_phoc_embedding).to(depth_enhance_ocr_appearance.device)
+        
         # -- OCR embedding
         # BS, num_ocr, hidden_size
+        # out_defum = self.linear_out_defum(depth_enhance_ocr_appearance)
+        # out_sgam = self.linear_out_sgam(semantic_representation_ocr_tokens)
+        # out_phoc = self.linear_out_phoc(ocr_phoc_embedding)
+        
         ocr_embed = self.LayerNorm(
             self.linear_out_defum(depth_enhance_ocr_appearance) + \
             self.linear_out_sgam(semantic_representation_ocr_tokens) + \
@@ -284,7 +311,10 @@ class OCREmbedding(BaseEmbedding):
         ) + \
         self.LayerNorm(
             self.linear_out_ocr_boxes(ocr_boxes) + \
-            self.linear_out_ocr_conf(ocr_conf)
+            self.linear_out_ocr_conf(
+                torch.tensor(ocr_conf).unsqueeze(-1) \
+                    .to(ocr_boxes.device)
+            )
         )
         # x_ocr, x_ft', x_k_voc
         return ocr_embed, semantic_representation_ocr_tokens, visual_concept_embed

@@ -15,6 +15,7 @@ from utils.logger import Logger
 from utils.vocab import OCRVocab
 from utils.metrics import metric_calculate
 from utils.utils import save_json
+from icecream import ic
 
 # ~Trainer~
 class Trainer():
@@ -29,6 +30,7 @@ class Trainer():
         self.writer_inference = Logger(name="inference")
         
         self.build()
+        self.load_task()
 
     #---- LOAD TASK
     def load_task(self):
@@ -48,7 +50,7 @@ class Trainer():
             config=self.config.config_model, 
             device=self.device, 
             writer=self.writer # kwargs
-        )
+        ).to(self.device)
 
 
     def build_training_params(self):
@@ -59,9 +61,15 @@ class Trainer():
         self.current_epoch = 0
 
         # Training
-        self.optimizer = self.build_optimizer()
+        self.optimizer = self.build_optimizer(
+            model=self.model,
+            config_optimizer=self.config.config_optimizer
+        )
         self.loss_fn = self.build_loss()
-        self.lr_scheduler = self.build_scheduler()
+        self.lr_scheduler = self.build_scheduler(
+            optimizer=self.optimizer,
+            config_lr_scheduler=self.config.config_lr_scheduler
+        )
 
         # Resume training
         if self.args.resume_file != None:
@@ -71,7 +79,7 @@ class Trainer():
     def build_scheduler(self, optimizer, config_lr_scheduler):
         if not config_lr_scheduler["status"]:
             return None
-        lr_scheduler = nn.optim.lr_scheduler.StepLR(
+        lr_scheduler = torch.optim.lr_scheduler.StepLR(
             optimizer=optimizer,
             step_size=config_lr_scheduler["step_size"],
             gamma=config_lr_scheduler["gamma"]
@@ -85,13 +93,13 @@ class Trainer():
 
 
     def build_optimizer(self, model, config_optimizer):
-        if not hasattr(config_optimizer, "type"):
+        if "type" not in config_optimizer:
             raise ValueError(
                 "Optimizer attributes must have a 'type' key "
                 "specifying the type of optimizer. "
                 "(Custom or PyTorch)"
             )
-        optimizer_type = config_optimizer.type
+        optimizer_type = config_optimizer["type"]
 
         #-- Load params
         if not hasattr(config_optimizer, "params"):
@@ -124,8 +132,11 @@ class Trainer():
 
 
     def _extract_loss(self, scores, targets):
+        B, max_length, C = scores.shape
+        scores_flat = scores.view(B * max_length, C)           # [2*30, 6048]
+        targets_flat = targets.view(B * max_length) 
         loss_output = self.loss_fn(
-            scores, targets
+            scores_flat, targets_flat
         ) 
         return loss_output
 
@@ -166,20 +177,28 @@ class Trainer():
                 - Padding ocr and obj to the same length
                 - Create mask for ocr and obj
         """
-        model_config = self.model.config.config_model
+        model_config = self.model.config
+        dim_ocr = model_config["ocr"]["dim"]
+        dim_obj = model_config["obj"]["dim"]
         box_pad = torch.rand((1, 4))
+
         # Padding ocr
-        ocr_feat_pad = torch.rand((1, self.dim_ocr))
+        ocr_feat_pad = torch.rand((1, dim_ocr))
         batch["list_ocr_boxes"], ocr_mask = _batch_padding(batch["list_ocr_boxes"], max_length=model_config["ocr"]["num_ocr"], pad_value=box_pad)
         batch["list_ocr_feat"] = _batch_padding(batch["list_ocr_feat"], max_length=model_config["ocr"]["num_ocr"], pad_value=ocr_feat_pad, return_mask=False)
         batch["list_ocr_tokens"] = _batch_padding_string(batch["list_ocr_tokens"], max_length=model_config["ocr"]["num_ocr"], pad_value="<pad>", return_mask=False)
         batch["ocr_mask"] = ocr_mask
 
         # Padding obj
-        obj_feat_pad = torch.rand((1, self.dim_obj))
+        obj_feat_pad = torch.rand((1, dim_obj))
         batch["list_obj_boxes"], obj_mask = _batch_padding(batch["list_obj_boxes"], max_length=model_config["obj"]["num_obj"], pad_value=box_pad)
         batch["list_obj_feat"] = _batch_padding(batch["list_obj_feat"], max_length=model_config["obj"]["num_obj"], pad_value=obj_feat_pad, return_mask=False)
         batch["obj_mask"] = obj_mask
+
+        # Padding ocr scores/ confidence
+        ocr_score_pad = 0
+        batch["list_ocr_scores"] = _batch_padding_string(batch["list_ocr_scores"], max_length=model_config["ocr"]["num_ocr"], pad_value=ocr_score_pad, return_mask=False)
+
         return batch
 
 
@@ -192,8 +211,10 @@ class Trainer():
         self.model.train()
 
         while self.current_iteration < self.max_iterations:
-            self.current_epochs += 1
-            for batch in tqdm(self.train_loader):
+            self.current_epoch += 1
+            self.writer.LOG_INFO(f"Training epoch: {self.current_epoch}")
+            for batch_id, batch in tqdm(enumerate(self.train_loader), desc="Iterating through train loader"):
+                self.writer.LOG_INFO(f"Training batch: {batch_id + 1}")
                 batch = self.preprocess_batch(batch)
                 list_ocr_tokens = batch["list_ocr_tokens"]
                 list_captions = batch["list_captions"]
@@ -203,7 +224,7 @@ class Trainer():
                 scores_output = self._forward_pass(batch)
                 targets = self.model.word_embedding.get_prev_inds(
                     list_captions, list_ocr_tokens
-                )
+                ).to(self.device)
                 loss = self._extract_loss(scores_output, targets)
                 self._backward(loss)
                 
@@ -226,7 +247,9 @@ class Trainer():
             hypo: dict = {}
             ref : dict = {}
             self.model.eval()
-            for batch in dataloader:
+
+            for batch_id, batch in tqdm(enumerate(dataloader), desc=f"Evaluating {split} loader"):
+                self.writer_evaluation.LOG_INFO(f"Evaluate batch: {batch_id + 1}")
                 list_id = batch["list_id"]
                 list_ocr_tokens = batch["list_ocr_tokens"]
                 list_captions = batch["list_captions"]
@@ -236,7 +259,8 @@ class Trainer():
                 scores_output = self._forward_pass(batch)
                 targets = self.model.word_embedding.get_prev_inds(
                     list_captions, list_ocr_tokens
-                )
+                ).to(self.device)
+                ic(targets.shape)
                 loss = self._extract_loss(scores_output, targets)
                 
                 #~ Metrics calculation
@@ -273,7 +297,7 @@ class Trainer():
                 scores_output = self._forward_pass(batch)
                 targets = self.model.word_embedding.get_prev_inds(
                     list_captions, list_ocr_tokens
-                )
+                ).to(self.device)
                 loss = self._extract_loss(scores_output, targets)
                 
                 #~ Metrics calculation

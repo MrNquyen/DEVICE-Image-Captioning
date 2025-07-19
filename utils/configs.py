@@ -8,4 +8,5 @@ class Config():
         self.config_model = self.config_base["model_attributes"]
         self.config_optimizer = self.config_base["optimizer_attributes"]
         self.config_training = self.config_base["training_parameters"]
+        self.config_lr_scheduler = self.config_training["lr_scheduler"]
     

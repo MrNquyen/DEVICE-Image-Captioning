@@ -5,8 +5,8 @@ setup(
     packages=["utils.phoc.src"],
     ext_modules=[
         Extension(
-            "utils.phoc.src.cphoc",
-            ["utils/phoc/src/cphoc.c"],
+            "utils.phoc.src.cphoc_vn",
+            ["utils/phoc/src/cphoc_vn.c"],
             # you may need extra compile/link flags here
         )
     ]

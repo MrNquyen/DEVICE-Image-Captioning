@@ -2,6 +2,7 @@ import torch
 from collections import defaultdict
 from torch import nn
 from utils.utils import load_vocab
+from icecream import ic
 
 # Use to training tokenizer from scratch
 class BaseVocab(nn.Module):
@@ -36,6 +37,7 @@ class BaseVocab(nn.Module):
                 Size of the embedding
 
         """
+        super().__init__()
         #-- 1. Init stoi and itos
         self.word_dict = {}
         self.word_dict[self.PAD_TOKEN] = self.PAD_INDEX
@@ -49,16 +51,19 @@ class BaseVocab(nn.Module):
         self.itos[self.EOS_INDEX] = self.EOS_TOKEN
         self.itos[self.UNK_INDEX] = self.UNK_TOKEN
 
+        self.embedding_dim = embedding_dim
+        # ic(vocab_file)
         self.vocabs = load_vocab(vocab_file)
+        # ic(self.vocabs)s
         for i, token in enumerate(self.vocabs):
             self.word_dict[token] = 4 + i + 1
             self.itos[4 + i + 1] = token
 
-        self.stoi = defaultdict(lambda: self.UNK_INDEX, self.vocab_dict)
+        self.stoi = defaultdict(lambda: self.UNK_INDEX, self.word_dict)
 
         #-- 2. Init vector embedding for all word in vocabulary
             #~ Random init matrix: len_vocab x embedding_size
-        self.vectors = torch.FloatTensor(self.get_size(), embedding_dim)
+        self.vectors = torch.FloatTensor(self.get_size(), self.embedding_dim)
 
     def get_itos(self):
         return self.itos
@@ -112,7 +117,7 @@ class BaseVocab(nn.Module):
     
 
 #------------------------------------------------
-class PretrainedVocab(BaseVocab, nn.Module):
+class PretrainedVocab(BaseVocab):
     def __init__(
             self, 
             model=None,
@@ -130,14 +135,18 @@ class PretrainedVocab(BaseVocab, nn.Module):
             Vocabulary file containing list of words with one word per line
             which will be used to collect vectors
         """
-        super(PretrainedVocab).__init__(vocab_file)
+        embedding_dim = model.config.hidden_size
+        super().__init__(
+            vocab_file=vocab_file, 
+            embedding_dim=embedding_dim
+        )
         self.model = model
         self.tokenizer = tokenizer
         
         # Vector embedding of inforgraphic vocabulary
         self.vectors = nn.Embedding(
             num_embeddings=len(self.stoi),
-            embedding_dim=768
+            embedding_dim=self.embedding_dim
         )
         self.create_embedding()
 
@@ -146,16 +155,22 @@ class PretrainedVocab(BaseVocab, nn.Module):
         """
         Use to get embedding value of singular word
         """
-        vocabs = self.stoi.keys()
+        vocabs = list(self.stoi.keys())
+        # ic(vocabs)
 
         # Pretrained static features
         embeddings: torch.Tensor = self.model.embeddings.word_embeddings.weight
-        vocab_input_ids = self.tokenizer(
-            torch.tensor(vocabs),
-            add_special_tokens=False,
-            return_tensors="pt",
+        vocab_ids = self.tokenizer.convert_tokens_to_ids(
+            vocabs
         )
-        vocab_embedding = embeddings[vocab_input_ids]
+        
+        ## DEBUG
+        # for word, input_id in zip(vocabs, vocab_ids):
+        #     if len(input_id) > 1:
+        #         print(f"{word}: {input_id}")
+        ## DEBUG
+
+        vocab_embedding = embeddings[vocab_ids]
         self.vectors.weight.data.copy_(vocab_embedding)
 
     def get_vocab_embedding(self):
@@ -190,7 +205,7 @@ class OCRVocabItem:
             OCR Vocab for each images
         """
         self.stoi = {token: i for i, token in enumerate(each_ocr_tokens)}
-        self.itos = {i: token for token, i in self.stoi}
+        self.itos = {i: token for token, i in self.stoi.items()}
 
     def get_word_idx(self, word):
         """

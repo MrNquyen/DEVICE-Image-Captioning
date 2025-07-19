@@ -2,7 +2,11 @@ import diffusers
 import torch
 import os
 from tqdm import tqdm
+from PIL import Image
 from torch.utils.data import Dataset, DataLoader
+import numpy as np
+import cv2
+
 
 def load_model(path, device):
     pipe = diffusers.MarigoldDepthPipeline.from_pretrained(
@@ -10,6 +14,17 @@ def load_model(path, device):
     ).to(device)
     return pipe
 
+MIN_SIZE = 800
+MAX_SIZE = 1333
+
+def load_image(path):
+    img = cv2.imread(path,1)
+    # Convert BGR (OpenCV format) to RGB
+    cv2_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+    # Convert to PIL Image
+    img = Image.fromarray(cv2_rgb)
+    return img
 
 #----------DATASET----------
 class ViInforgraphicDataset(Dataset):
@@ -73,10 +88,14 @@ if __name__=="__main__":
         if len(list_id)==0:
             continue
         
-        images = [
-            diffusers.utils.load_image(img_path)
-            for img_path in list_image_path
-        ]
+        images = []
+        for img_path in list_image_path:
+            try:
+                image = diffusers.utils.load_image(img_path)
+            except:
+                image = load_image(img_path)
+            images.append(image)
+
         depth = pipe(images)
         depth_16bit = pipe.image_processor.export_depth_to_16bit_png(depth.prediction)
         for id, depth in zip(list_id, depth_16bit):

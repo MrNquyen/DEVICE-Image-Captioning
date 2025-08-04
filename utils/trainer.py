@@ -221,7 +221,7 @@ class Trainer():
 
                 self.current_iteration += 1
                 #~ Loss cal
-                scores_output = self._forward_pass(batch)
+                scores_output, caption_inds = self._forward_pass(batch)
                 targets = self.model.word_embedding.get_prev_inds(
                     list_captions, list_ocr_tokens
                 ).to(self.device)
@@ -232,9 +232,17 @@ class Trainer():
                     break
             
             if self.current_epoch % 2 == 0:
-                self.evaluate(epoch_id=self.current_epoch, split="val")
-                self.evaluate(epoch_id=self.current_epoch, split="test")
-
+                _, _, val_final_scores, loss = self.evaluate(epoch_id=self.current_epoch, split="val")
+                # _, _, final_scores = self.evaluate(epoch_id=self.current_epoch, split="test")
+                if val_final_scores > best_scores:
+                    best_scores = val_final_scores
+                    self.save_model(
+                        model=self.model,
+                        loss=loss,
+                        optimizer=self.optimizer,
+                        epoch=self.current_epoch, 
+                        metric_score=best_scores
+                    )
     
     def evaluate(self, epoch_id=None, split="val"):
         if hasattr(self, f"{split}_loader"):
@@ -246,6 +254,7 @@ class Trainer():
         with torch.inference_mode():
             hypo: dict = {}
             ref : dict = {}
+            losses = []
             self.model.eval()
 
             for batch_id, batch in tqdm(enumerate(dataloader), desc=f"Evaluating {split} loader"):
@@ -256,13 +265,12 @@ class Trainer():
                 batch = self.preprocess_batch(batch)
                 
                 #~ Calculate loss
-                scores_output = self._forward_pass(batch)
+                scores_output, pred_inds = self._forward_pass(batch)
                 targets = self.model.word_embedding.get_prev_inds(
                     list_captions, list_ocr_tokens
                 ).to(self.device)
-                ic(targets.shape)
                 loss = self._extract_loss(scores_output, targets)
-                
+                losses.append(loss)
                 #~ Metrics calculation
                 if not epoch_id==None:
                     self.writer_evaluation.LOG_INFO(f"Logging at epoch {epoch_id}")
@@ -274,69 +282,40 @@ class Trainer():
             
             # Calculate Metrics
             final_scores = metric_calculate(ref, hypo)
+            loss = sum(losses) / len(losses) 
             self.writer_evaluation.LOG_INFO(f"|| Metrics Calculation || {split} split || epoch: {epoch_id} || loss: {loss}")
             self.writer_evaluation.LOG_INFO(f"Final scores:\n{final_scores}")
             
             # Turn on train mode to continue training
             self.model.train()
-        return scores_output
+        return hypo, ref, final_scores, loss
     
 
-    def test(self):
-        with torch.inference_mode():
-            hypo: dict = {}
-            ref : dict = {}
-            self.model.eval()
-            for batch in self.test_loader:
-                list_id = batch["list_id"]
-                list_ocr_tokens = batch["list_ocr_tokens"]
-                list_captions = batch["list_captions"]
-                batch = self.preprocess_batch(batch)
-                
-                #~ Calculate loss
-                scores_output = self._forward_pass(batch)
-                targets = self.model.word_embedding.get_prev_inds(
-                    list_captions, list_ocr_tokens
-                ).to(self.device)
-                loss = self._extract_loss(scores_output, targets)
-                
-                #~ Metrics calculation
-                pred_caps = self.get_pred_captions(scores_output, list_ocr_tokens)
-                for id, pred_cap, ref_cap in zip(list_id, pred_caps, list_captions):
-                    hypo[id] = [pred_cap]
-                    ref[id]  = [ref_cap]
-            
-            # Calculate Metrics
-            final_scores = metric_calculate(ref, hypo)
-            self.writer_inference.LOG_INFO(f"=== INFERENCE ON TEST ===")
-            self.writer_inference.LOG_INFO(f"|| Metrics Calculation || loss: {loss}")
-            self.writer_inference.LOG_INFO(f"Final scores:\n{final_scores}")
-            self.save_inference(
-                hypo=hypo,
-                ref=ref,
-                scores=final_scores,
-                save_dir=self.args.save_dir,
-                name="test"
-            )
-
-
-    def inference(self, mode):
+    def inference(self, mode, save_dir):
         """
             Parameters:
                 mode:   Model to run "val" or "test"
         """
         if mode=="val":
             self.writer_inference.LOG_INFO("=== Inference Validation Split ===")
-            scores_output = self.evaluate()
+            hypo, ref = self.evaluate(epoch_id="Inference val set", split="val")
         elif mode=="test":
             self.writer_inference.LOG_INFO("=== Inference Test Split ===")
-            scores_output = self.test()
+            hypo, ref = self.evaluate(epoch_id="Inference test set", split="test")
         else:
             self.writer_inference.LOG_ERROR(f"No mode available for {mode}")
-            return
+        
+        # Save Inference
+        self.save_inference(
+            hypo=hypo,
+            ref=ref,
+            save_dir=save_dir,
+            name=mode
+        )
+        return hypo, ref
 
     #---- FINISH
-    def save_model(self, model, loss, optimizer, epoch):
+    def save_model(self, model, loss, optimizer, epoch, metric_score):
         if os.path.exists(self.args.save_dir):
             self.writer("Save dir not exist")
             raise FileNotFoundError
@@ -349,6 +328,7 @@ class Trainer():
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': optimizer.state_dict(),
             'loss': loss,
+            "metric_score": metric_score
         }, model_path)
 
     
@@ -385,13 +365,12 @@ class Trainer():
         return captions_pred # BS, 
     
 
-    def save_inference(self, hypo, ref, scores, save_dir, name=""):
+    def save_inference(self, hypo, ref, save_dir, name=""):
         save_path = os.path.join(save_dir, f"{name}_reference")
         inference: dict = {
             id : {
                 "gt": ref[id],
-                "pred": hypo[id],
-                "scores": scores
+                "pred": hypo[id]
             } for id in ref.keys()
         }
         save_json(save_path, content=inference)

@@ -7,7 +7,7 @@ from PIL import Image
 from icecream import ic
 from transformers import CLIPProcessor, CLIPModel
 from torch.nn import functional as F
-from projects.modules.multimodal_embedding import ObjEmbedding, OCREmbedding, Sync, WordEmbedding
+from projects.modules.multimodal_embedding_v2 import ObjEmbedding, OCREmbedding, Sync, WordEmbedding
 from projects.modules.decoder import EncoderAsDecoder 
 from utils.configs import Config
 from utils.module_utils import _batch_padding, _batch_padding_string
@@ -50,8 +50,6 @@ class BaseModel(nn.Module):
         self.model_clip.gradient_checkpointing_enable()
     def build_fasttext_model(self):
         self.fasttext_model = fasttext.load_model(self.config["fasttext_bin"])
-
-
 
 #---------- DEVICE MODEL ----------
 class DEVICE(BaseModel):
@@ -307,7 +305,7 @@ class DEVICE(BaseModel):
 
         #-- OBJ Embedding
         obj_embed = self.obj_embedding(
-            list_image_id=batch["list_id"], 
+            list_depth_images=batch["list_depth_images"], 
             boxes=batch["list_obj_boxes"], 
             obj_feats=batch["list_obj_feat"]
         )
@@ -316,7 +314,7 @@ class DEVICE(BaseModel):
         ocr_embed, \
         semantic_representation_ocr_tokens, \
         visual_concept_embed = self.ocr_embedding(
-            list_image_id=batch["list_id"], 
+            list_depth_images=batch["list_depth_images"], 
             ocr_boxes=batch["list_ocr_boxes"], 
             ocr_feats=batch["list_ocr_feat"],
             ocr_tokens=batch["list_ocr_tokens"],

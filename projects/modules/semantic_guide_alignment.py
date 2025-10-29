@@ -35,14 +35,14 @@ class SgAM(nn.Module):
         """
             :params words:  List of word needed to embedded
         """
-        fasttext_embedding = [
+        fasttext_embed = [
             fasttext_embedding_module(
                 model=self.fasttext_model,
                 word=word
             ) 
             for word in words
         ]
-        return fasttext_embedding
+        return fasttext_embed
     
 
     def forward(self, image_ids, image_dir, ocr_tokens):
@@ -50,21 +50,19 @@ class SgAM(nn.Module):
             :params ocr_tokens: BS, num_ocr : List of ocr_tokens of an image
             :params image_ids:  BS, 1       : List of images
         """
-        top_K_fasttext_embeddings, visual_concept_embedding = self.salient_object_extractor(image_ids, image_dir)
+        top_K_fasttext_embeds, visual_concept_embed = self.salient_object_extractor(image_ids, image_dir)
         fasttext_ocr_tokens = [self.fasttext_embedding(tokens) for tokens in ocr_tokens]
-        fasttext_ocr_tokens = torch.tensor(fasttext_ocr_tokens).to(top_K_fasttext_embeddings.device) # BS, num_ocr (M), 300
+        fasttext_ocr_tokens = torch.tensor(fasttext_ocr_tokens).to(top_K_fasttext_embeds.device) # BS, num_ocr (M), 300
 
-        # ic(fasttext_ocr_tokens.device)
-        # ic(top_K_fasttext_embeddings.device)
         # Semantic attention
         Q_s = self.semantic_attention(
             fasttext_ocr_tokens=fasttext_ocr_tokens, 
-            fasttext_object_concepts=top_K_fasttext_embeddings
+            fasttext_object_concepts=top_K_fasttext_embeds
         ) # BS, top K, num_ocr
 
         # Semantic Embedding
-        Q_s = torch.bmm(Q_s, top_K_fasttext_embeddings)
+        Q_s = torch.bmm(Q_s, top_K_fasttext_embeds)
         semantic_representation_ocr_tokens = F.normalize(fasttext_ocr_tokens + Q_s, p=2, dim=-1)
-        return semantic_representation_ocr_tokens, visual_concept_embedding
+        return semantic_representation_ocr_tokens, visual_concept_embed
 
 

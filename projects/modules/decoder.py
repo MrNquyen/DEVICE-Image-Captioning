@@ -250,8 +250,6 @@ class EncoderAsDecoder(RobertaPreTrainedModel):
 
         #-- Casual masking for multihead broadcasting
             #~ Start Casual masking at start of dec_input 
-        # ic(_get_causal_mask(dec_input_end - dec_input_begin, encoder_inputs.device).shape)
-        # ic(extended_attention_mask.shape)
         extended_attention_mask[:, :, dec_input_begin:, dec_input_begin:] = \
             _get_causal_mask(dec_input_end - dec_input_begin, encoder_inputs.device)
         

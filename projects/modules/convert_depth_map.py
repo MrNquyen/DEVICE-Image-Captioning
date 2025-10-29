@@ -92,3 +92,62 @@ class DepthExtractor():
 
 
 
+class DepthExtractorDirect():
+    def __init__(self):
+        pass
+
+    def get_depth_value(self, depth_image, box):
+        # ic(depth_image.shape)
+        channel, height, width = depth_image.shape
+        
+        # Load norm coordinate
+        xmin_norm, ymin_norm, xmax_norm, ymax_norm = box
+        
+        # Scale to original
+        x_min = int(xmin_norm * width)
+        y_min = int(ymin_norm * height)
+        x_max = int(xmax_norm * width)
+        y_max = int(ymax_norm * height)
+
+        x_min = min(x_min, x_max)
+        x_max = max(x_min, x_max)
+        y_min = min(y_min, y_max)
+        y_max = max(y_min, y_max)
+
+        if x_min == x_max:
+            x_min -= 2
+            x_max -= 1
+        if y_min == y_max:
+            y_min -= 2
+            y_max -= 1
+
+
+        if y_max > height:
+            y_max = height
+        if x_max > width:
+            x_max = width
+        
+        if x_min > x_max:
+            x_min, x_max = x_max, x_min
+            y_min, y_max = y_max, y_min
+
+        # Crop the image and get highest frequency gray value
+        cropped_image = depth_image[0][y_min:y_max, x_min:x_max]
+        flatten_image = cropped_image.flatten()
+        counter = Counter(flatten_image)
+        highest_freq = None
+        try:
+            highest_freq = counter.most_common()[0][0]
+        except:
+            ic("-----")
+            ic(height, width)
+            ic(box)
+            ic(x_min, y_min, x_max, y_max)
+            ic(flatten_image)
+            ic(cropped_image)
+            ic(counter)
+            ic(counter.most_common())
+        # ic(highest_freq)
+        return highest_freq / 255
+
+

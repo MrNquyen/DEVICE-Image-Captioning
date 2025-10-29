@@ -4,7 +4,6 @@ import numpy as np
 from PIL import Image
 from typing import List
 from torch import nn
-from transformers import CLIPProcessor, CLIPModel
 from utils.utils import load_vocab, load_list_images_fast
 from utils.module_utils import fasttext_embedding_module
 from icecream import ic
@@ -112,15 +111,14 @@ class SaVOExtractor(nn.Module):
         #-- embedding of visual object concepts to Fasttext
         # BS, top_K, 300
         top_K_similarities = torch.tensor(top_K_similarities).unsqueeze(-1)
-        top_K_fasttext_embeddings = [self.fasttext_embedding(top_K_object) for top_K_object in top_K_objects]
-        ic(type(top_K_fasttext_embeddings[0]))
-        top_K_fasttext_embeddings = torch.tensor(top_K_fasttext_embeddings).to(top_K_similarities.device)
+        top_K_fasttext_embeds = [self.fasttext_embedding(top_K_object) for top_K_object in top_K_objects]
+        top_K_fasttext_embeds = torch.tensor(top_K_fasttext_embeds).to(top_K_similarities.device)
 
-        embed_voc = self.LayerNorm_voc(self.linear_voc(top_K_fasttext_embeddings))
+        embed_voc = self.LayerNorm_voc(self.linear_voc(top_K_fasttext_embeds))
         embed_score = self.LayerNorm_score(self.linear_score(top_K_similarities))
         
-        visual_concept_embedding = embed_voc + embed_score
+        visual_concept_embed = embed_voc + embed_score
         
         # FT(a_k_voc ), x_k_voc
         # BS, k, 300 - BS, k, hidden_size 
-        return top_K_fasttext_embeddings, visual_concept_embedding
+        return top_K_fasttext_embeds, visual_concept_embed

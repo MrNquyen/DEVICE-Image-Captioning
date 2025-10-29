@@ -14,8 +14,6 @@ def load_model(path, device):
     ).to(device)
     return pipe
 
-MIN_SIZE = 800
-MAX_SIZE = 1333
 
 def load_image(path):
     img = cv2.imread(path,1)
@@ -65,16 +63,16 @@ def get_loader(img_dir):
 
 
 if __name__=="__main__":
-    image_dir = "/data/npl/ViInfographicCaps/images/images"
-    path = "/data/npl/ViInfographicCaps/hf_model/marigold-depth-v1-0"
-    save_dir = "/data/npl/ViInfographicCaps/features/depth_images"
+    image_dir = "/datastore/npl/ViInfographicCaps/data/images"
+    path = "/datastore/npl/ViInfographicCaps/model/marigold-depth-v1-0"
+    save_dir = "/datastore/npl/ViInfographicCaps/data/depth_images"
     
     if torch.cuda.is_available():
         print("Exist cuda")
     else:
         raise Exception("No cuda found")
 
-    device = "cuda:1"
+    device = "cuda:0"
     pipe = load_model(path, device=device)
     dataloader = get_loader(image_dir)
 

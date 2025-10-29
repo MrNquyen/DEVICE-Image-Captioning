@@ -2,7 +2,7 @@ import torch
 from torch import nn
 from typing import List
 
-from projects.modules.convert_depth_map_buffer import DepthExtractor
+from projects.modules.convert_depth_map import DepthExtractor, DepthExtractorDirect
 from projects.modules.depth_enhance_update import DeFUM
 from projects.modules.semantic_guide_alignment import SgAM
 from utils.module_utils import fasttext_embedding_module, _batch_padding_string
@@ -110,7 +110,8 @@ class BaseEmbedding(nn.Module):
         self.hidden_size = config["hidden_size"]
         self.common_dim = config["feature_dim"]
         
-        self.depth_extractor = DepthExtractor(depth_images_dir=config["depth_images_dir"])
+        # self.depth_extractor = DepthExtractor(depth_images_dir=config["depth_images_dir"])
+        self.depth_extractor_direct = DepthExtractorDirect()
         self.LayerNorm = nn.LayerNorm(normalized_shape=self.hidden_size)
 
 

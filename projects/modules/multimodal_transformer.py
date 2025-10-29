@@ -35,23 +35,22 @@ class MultimodalTransformerEncoder(MultimodalTransformer):
 
     def forward(
             self, 
-            obj_embedding,
-            ocr_embedding,
+            obj_embed,
+            ocr_embed,
             semantic_representation_ocr_tokens, 
-            visual_concept_embedding,
+            visual_concept_embed,
         ):
         """
-            :params obj_embedding:                      BS, num_obj, hidden_size
-            :params ocr_embedding:                      BS, num_ocr, hidden_size
+            :params obj_embed:                      BS, num_obj, hidden_size
+            :params ocr_embed:                      BS, num_ocr, hidden_size
             :params semantic_representation_ocr_tokens: BS, num_ocr, hidden_size 
-            :params visual_concept_embedding:           BS, top_K, hidden_size
-            :params prev_word_embedding:                BS, hidden_size
+            :params visual_concept_embed:               BS, top_K, hidden_size
         """
         concat_feature_embedding = torch.concat([
-            obj_embedding,
-            ocr_embedding,
+            obj_embed,
+            ocr_embed,
             semantic_representation_ocr_tokens,
-            visual_concept_embedding
+            visual_concept_embed
         ], dim=1)
         encoder_output = self.transformer_encoder(concat_feature_embedding)
         # BS, num_obj + num_ocr + num_ocr + top_K, hidden_size 
@@ -98,13 +97,13 @@ class PrevEmbedding(nn.Module):
 
     def forward(
             self,
-            common_voc_embedding,
-            ocr_embedding,
+            common_voc_embed,
+            ocr_embed,
             prev_ids
         ):
         """
-            :params common_voc_embedding    :  common_vocab_len, hidden_size:   All embedding of common vocab
-            :params ocr_embedding           :  BS, num_ocr, hidden_size     :   All ocr embedding
+            :params common_voc_embed    :  common_vocab_len, hidden_size:   All embedding of common vocab
+            :params ocr_embed           :  BS, num_ocr, hidden_size     :   All ocr embedding
             :params prev_ids                :  BS, list_prev_idx_in_vocab   :   All idx in vocab of prev word in 
             ----
             Note:
@@ -118,22 +117,22 @@ class PrevEmbedding(nn.Module):
         # -- Params
         batch_size = prev_ids.shape[0]
         current_seq_length = prev_ids.shape[1]
-        vocab_size = common_voc_embedding.shape[0]
-        ocr_size = ocr_embedding.shape[1]
+        vocab_size = common_voc_embed.shape[0]
+        ocr_size = ocr_embed.shape[1]
 
         # -- Get prev vector embed
-        common_voc_embedding = self.common_voc_embedding_norm(common_voc_embedding)
-        ocr_embedding = self.ocr_embedding_norm(ocr_embedding)
-        assert common_voc_embedding.size(-1) == ocr_embedding.size(-1)
+        common_voc_embed = self.common_voc_embedding_norm(common_voc_embed)
+        ocr_embed = self.ocr_embedding_norm(ocr_embed)
+        assert common_voc_embed.size(-1) == ocr_embed.size(-1)
 
-        common_voc_embedding.unsqueeze(0).expand(batch_size, -1, -1)
-        look_up_table_embedding = torch.concat(
-            [common_voc_embedding, ocr_embedding],
+        common_voc_embed = common_voc_embed.unsqueeze(0).expand(batch_size, -1, -1)
+        look_up_table_embed = torch.concat(
+            [common_voc_embed, ocr_embed],
             dim=1
         )
 
-        last_word_embeddings = _batch_gather(
-            x=look_up_table_embedding, 
+        last_word_embeds = _batch_gather(
+            x=look_up_table_embed, 
             inds=prev_ids
         )
 
@@ -141,22 +140,22 @@ class PrevEmbedding(nn.Module):
         position_ids = torch.arange(
             current_seq_length,
             dtype=torch.long,
-            device=ocr_embedding.device
+            device=ocr_embed.device
         )
         position_ids = position_ids.unsqueeze(0).expand(batch_size, -1)
-        position_embeddings = self.positional_embedding(position_ids)
+        position_embeds = self.positional_embedding(position_ids)
 
         # -- Type embedding: 0: common tokens (False) - 1: ocr_tokens (True)
         type_ids = position_ids.ge(vocab_size).long()
-        token_type_embedddings = self.token_type_embedding(type_ids)
+        token_type_embeds = self.token_type_embedding(type_ids)
 
         # -- Position and token type
-        pos_type_embeddings = position_embeddings + token_type_embedddings 
-        pos_type_embeddings = self.emb_layer_norm(pos_type_embeddings)
-        pos_type_embeddings = self.emb_dropout(pos_type_embeddings)
+        pos_type_embeds = position_embeds + token_type_embeds 
+        pos_type_embeds = self.emb_layer_norm(pos_type_embeds)
+        pos_type_embeds = self.emb_dropout(pos_type_embeds)
 
         # -- LastWord, Position, token type
-        prev_emb = last_word_embeddings + pos_type_embeddings
+        prev_emb = last_word_embeds + pos_type_embeds
         return prev_emb # BS, num_prev_words, hidden_size
 
 

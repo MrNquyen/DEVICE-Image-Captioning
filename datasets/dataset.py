@@ -5,6 +5,7 @@ from tqdm import tqdm
 from torch.utils.data import Dataset, DataLoader
 
 from utils.utils import load_json, load_npy
+from utils.transform import Transform
 from icecream import ic
 
 #----------DATASET----------
@@ -12,20 +13,23 @@ class ViInforgraphicDataset(Dataset):
     def __init__(self, dataset_config, split):
         super().__init__()
         ocr_feat_dir, obj_feat_dir = dataset_config["image_features"][split].split(", ")
-        
+        depth_images_dir = dataset_config["depth_images_dir"]
         imdb_path = dataset_config["imdb_files"][split]
         imdb = load_npy(imdb_path)
         self.data = []
-        for item in tqdm(imdb, desc=f"Loading {split} split"):
+        self.transform = Transform(image_size=448).transform_from_ndarray()
+        for item in tqdm(imdb[:10], desc=f"Loading {split} split"):
             im_id = item["image_id"]
 
             #-- OCR and OBJ feat
             ocr_feat_path = os.path.join(ocr_feat_dir, f"{im_id}.npy")
-            obj_feat_path = os.path.join(obj_feat_dir, f"{im_id}.npy")
+            obj_feat_path = os.path.join(obj_feat_dir, f"features/{im_id}.npy")
+            depth_image_path = os.path.join(depth_images_dir, f"{im_id}.npy")
             
             ocr_feat = load_npy(ocr_feat_path)
             obj_feat = load_npy(obj_feat_path)
-            
+            depth_image = self.transform(load_npy(depth_image_path))
+
             #-- data
             self.data.append({
                 "id": im_id,
@@ -39,7 +43,8 @@ class ViInforgraphicDataset(Dataset):
                 "caption_tokens": item["caption_tokens"],
                 "ocr_feat": ocr_feat.item()["det_features"],
                 "obj_feat": obj_feat,
-                "caption_str": item["caption_str"]
+                "caption_str": item["caption_str"],
+                "depth_image": depth_image
             })
 
 
@@ -56,23 +61,14 @@ def collate_fn(batch):
     list_im_width = [item["im_width"] for item in batch]
     list_im_height = [item["im_height"] for item in batch]
     list_ocr_tokens = [item["ocr_tokens"] for item in batch]
-    list_ocr_boxes = [item["ocr_boxes"] for item in batch]
-    
-    ## DEBUG
-    # for id, item in enumerate(list_ocr_boxes):
-    #     try:
-    #         item_length = item.shape[0]
-    #         ic(id, item_length)
-    #     except:
-    #         ic(item)
-    ## DEBUG
-    
+    list_ocr_boxes = [item["ocr_boxes"] for item in batch]    
     list_obj_boxes = [item["obj_boxes"] for item in batch]
     list_ocr_scores = [item["ocr_scores"] for item in batch]
     list_caption_tokens = [item["caption_tokens"] for item in batch]
     list_ocr_feat = [item["ocr_feat"] for item in batch]
     list_obj_feat = [item["obj_feat"] for item in batch]
     list_captions = [item["caption_str"] for item in batch]
+    list_depth_images = [item["depth_image"] for item in batch]
 
     return {
         "list_id": list_id,
@@ -87,6 +83,7 @@ def collate_fn(batch):
         "list_ocr_feat": list_ocr_feat,
         "list_obj_feat": list_obj_feat,
         "list_captions": list_captions,
+        "list_depth_images": list_depth_images,
     }
 
 

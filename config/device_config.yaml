@@ -1,23 +1,24 @@
 
 dataset_attributes:
+  depth_images_dir: /datastore/npl/ViInfographicCaps/data/depth_images_npy
   image_features:
-    # train: /data/npl/ViInfographicCaps/features/swintextspotter, /data/npl/ViInfographicCaps/features/faster_rcnn/features
-    train: /data/npl/ViInfographicCaps/features/swintextspotter, /data/npl/ViInfographicCaps/features/faster_rcnn/features
-    val: /data/npl/ViInfographicCaps/features/swintextspotter, /data/npl/ViInfographicCaps/features/faster_rcnn/features
-    test: /data/npl/ViInfographicCaps/features/swintextspotter, /data/npl/ViInfographicCaps/features/faster_rcnn/features
+    # train: /datastore/npl/ViInfographicCaps/data/swintextspotter, /datastore/npl/ViInfographicCaps/data/faster_rcnn
+    train: /datastore/npl/ViInfographicCaps/data/swintextspotter, /datastore/npl/ViInfographicCaps/data/faster_rcnn
+    val: /datastore/npl/ViInfographicCaps/data/swintextspotter, /datastore/npl/ViInfographicCaps/data/faster_rcnn
+    test: /datastore/npl/ViInfographicCaps/data/swintextspotter, /datastore/npl/ViInfographicCaps/data/faster_rcnn
     # - open_images/detectron_fix_100/fc6/test,m4c_textvqa_ocr_en_frcn_features/test_images
   imdb_files:
     # train: /data/npl/ViInfographicCaps/data/train_imdb.npy
-    train: /data/npl/ViInfographicCaps/data/val_imdb.npy
-    val: /data/npl/ViInfographicCaps/data/val_imdb.npy
-    test: /data/npl/ViInfographicCaps/data/test_imdb.npy
+    train: /datastore/npl/ViInfographicCaps/workspace/baseline/DEVICE/DEVICE-Image-Captioning/data/train_imdb.npy
+    val: /datastore/npl/ViInfographicCaps/workspace/baseline/DEVICE/DEVICE-Image-Captioning/data/val_imdb.npy
+    test: /datastore/npl/ViInfographicCaps/workspace/baseline/DEVICE/DEVICE-Image-Captioning/data/test_imdb.npy
 model_attributes:
-  image_dir: /data/npl/ViInfographicCaps/images/images
-  model_clip: /data/npl/ViInfographicCaps/hf_model/clip-vit-large-patch14
+  image_dir: /datastore/npl/ViInfographicCaps/data/images
+  model_clip: /datastore/npl/ViInfographicCaps/model/clip-vit-large-patch14
   fasttext_bin: ./utils/fasttext/wiki.vi.bin
-  depth_images_dir: /data/npl/ViInfographicCaps/features/depth_images
+  depth_images_dir: /datastore/npl/ViInfographicCaps/data/depth_images
   # fasttext_bin: utils/fasttext/wiki.vi.bin
-  model_decoder: /data/npl/ViInfographicCaps/hf_model/phobert-base
+  model_decoder: /datastore/npl/ViInfographicCaps/model/phobert-base
   hidden_size: 768
   ocr:
     dim: 256
@@ -33,15 +34,15 @@ model_attributes:
   sgam:
     savo:
       top_k: 15
-      vocab_path_en: /data/npl/ViInfographicCaps/workspace/baseline/DEVICE/DEVICE-Image-Captioning/data/object_vocab_en.txt
-      vocab_path_vi: /data/npl/ViInfographicCaps/workspace/baseline/DEVICE/DEVICE-Image-Captioning/data/object_vocab_vi.text
+      vocab_path_en: /datastore/npl/ViInfographicCaps/workspace/baseline/DEVICE/DEVICE-Image-Captioning/data/object_vocab_en.txt
+      vocab_path_vi: /datastore/npl/ViInfographicCaps/workspace/baseline/DEVICE/DEVICE-Image-Captioning/data/object_vocab_vi.txt
   mutimodal_transformer:
     num_layers: 4
     nhead: 12
     max_length: 32
     dropout: 0.1
   text_embedding:
-    common_vocab: ./data/vocab.txt
+    common_vocab: /datastore/npl/ViInfographicCaps/workspace/baseline/DEVICE/DEVICE-Image-Captioning/data/vocab.txt
     max_length: 30
     return_tensors: pt
   adjust_optimizer:

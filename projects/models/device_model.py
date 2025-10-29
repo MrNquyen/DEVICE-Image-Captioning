@@ -329,7 +329,7 @@ class DEVICE(BaseModel):
         # -- Training or Evaluating
         if self.training:
             #~ prev_inds
-            prev_inds = self.word_embedding.get_prev_inds(
+            caption_inds = self.word_embedding.get_prev_inds(
                 sentences=batch["list_captions"],
                 ocr_tokens=batch["list_ocr_tokens"]
             ).to(self.device)
@@ -341,10 +341,10 @@ class DEVICE(BaseModel):
                 semantic_representation_ocr_tokens=semantic_representation_ocr_tokens,
                 visual_concept_embed=visual_concept_embed,
                 common_vocab_embed=common_vocab_embed,
-                prev_inds=prev_inds
+                prev_inds=caption_inds
             )
             scores = self.forward_output(results)
-            return scores
+            return scores, caption_inds
         else:
             num_dec_step = self.word_embedding.max_length
             # Init prev_ids with <s> idx at begin, else where with <pad> (at idx 0)
@@ -355,6 +355,7 @@ class DEVICE(BaseModel):
             prev_inds = torch.full((batch_size, num_dec_step), pad_idx).to(self.device)
             prev_inds[:, 0] = start_idx
             scores = None
+
             for i in range(num_dec_step):
                 results = self.forward_mmt(
                     obj_embed=obj_embed,
@@ -369,7 +370,7 @@ class DEVICE(BaseModel):
                 scores = self.forward_output(results)
                 argmax_inds = scores.argmax(dim=-1)
                 prev_inds = argmax_inds[:, :-1]
-            return scores
+            return scores, prev_inds
 
 # ----- DYNAMIC POINTER NETWORK -----
 class OcrPtrNet(nn.Module):

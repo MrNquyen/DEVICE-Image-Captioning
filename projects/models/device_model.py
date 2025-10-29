@@ -10,23 +10,22 @@ from torch.nn import functional as F
 from projects.modules.multimodal_embedding_v2 import ObjEmbedding, OCREmbedding, Sync, WordEmbedding
 from projects.modules.decoder import EncoderAsDecoder 
 from utils.configs import Config
+from utils.registry import registry
 from utils.module_utils import _batch_padding, _batch_padding_string
 from transformers import AutoTokenizer, AutoModel, AutoConfig
 
 #---------- MODEL ----------
 class BaseModel(nn.Module):
-    def __init__(
-            self, 
-            config: Config, 
-            device: str
-        ):
+    def __init__(self):
         """
             :params config: Model Config
             :params device: device cuda
         """
         super().__init__()
-        self.config = config
-        self.device = device
+        self.config = registry.get_config("model_attributes")
+        self.device = registry.get_args("device")
+        self.writer = registry.get_writer("common")
+
         self.hidden_size = self.config["hidden_size"]
         self.build_model_init()
 
@@ -51,16 +50,16 @@ class BaseModel(nn.Module):
     def build_fasttext_model(self):
         self.fasttext_model = fasttext.load_model(self.config["fasttext_bin"])
 
+
+
 #---------- DEVICE MODEL ----------
 class DEVICE(BaseModel):
-    def __init__(self, config, device, **kwargs):
+    def __init__(self):
         """
             :params config: Model Config
             :params device: device cuda
         """
         super().__init__(config, device)
-        self.kwargs = kwargs
-        self.writer = kwargs["writer"]
         self.build()
 
 
@@ -108,18 +107,13 @@ class DEVICE(BaseModel):
 
     def build_layers(self):
         # Object embedding
-        self.obj_embedding = ObjEmbedding(
-            config=self.config,
-            device=self.device
-        )
+        self.obj_embedding = ObjEmbedding()
 
         # OCR Embedding
         self.ocr_embedding = OCREmbedding(
             model_clip=self.model_clip,
             fasttext_model=self.fasttext_model,
             processor_clip=self.processor_clip,
-            config=self.config,
-            device=self.device,
             image_dir=self.config["image_dir"] # kwargs
         )
 

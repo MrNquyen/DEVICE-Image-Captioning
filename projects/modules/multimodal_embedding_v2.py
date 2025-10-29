@@ -103,12 +103,14 @@ class WordEmbedding(nn.Module):
 
 #----------Embedding----------
 class BaseEmbedding(nn.Module):
-    def __init__(self, config, device):
+    def __init__(self):
         super().__init__()
-        self.config = config
-        self.device = device
-        self.hidden_size = config["hidden_size"]
-        self.common_dim = config["feature_dim"]
+        self.config = registry.get_config("model_attributes")
+        self.device = registry.get_args("device")
+        self.writer = registry.get_writer("common")
+
+        self.hidden_size = self.config["hidden_size"]
+        self.common_dim = self.config["feature_dim"]
         
         # self.depth_extractor = DepthExtractor(depth_images_dir=config["depth_images_dir"])
         self.depth_extractor_direct = DepthExtractorDirect()
@@ -151,8 +153,8 @@ class BaseEmbedding(nn.Module):
 
 #----------Embedding OCR----------
 class ObjEmbedding(BaseEmbedding):
-    def __init__(self, config, device):
-        super().__init__(config, device)
+    def __init__(self):
+        super().__init__()
 
         # Layer
         self.linear_feat = nn.Linear(
@@ -181,11 +183,9 @@ class ObjEmbedding(BaseEmbedding):
 
 #----------Embedding OBJ----------
 class OCREmbedding(BaseEmbedding):
-    def __init__(self, model_clip, processor_clip, fasttext_model, config, device, **kwargs):
-        super().__init__(config, device)
-        self.image_dir = kwargs.get("image_dir", None)
-        if self.image_dir == None:
-            raise Exception("Image directory cannot be None")
+    def __init__(self, model_clip, processor_clip, fasttext_model, image_dir):
+        super().__init__()
+        self.image_dir = image_dir
         self.fasttext_model = fasttext_model
         # Layers
         self.linear_out_defum = nn.Linear(

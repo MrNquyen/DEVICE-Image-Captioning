@@ -67,18 +67,18 @@ class Trainer():
         self.load_task()
         self.build_training_params()
 
-
     def build_model(self):
-        self.model = DEVICE()
-        self.model = self.model.to(self.device)
+        self.model = DEVICE(
+            config=self.config.config_model, 
+            device=self.device, 
+            writer=self.writer # kwargs
+        ).to(self.device)
 
 
     def build_training_params(self):
         self.max_epochs = self.config.config_training["epochs"]
         self.batch_size = self.config.config_training["batch_size"]
         self.max_iterations = self.config.config_training["max_iterations"]
-        self.snapshot_interval = self.config.config_training["snapshot_interval"]
-        self.early_stop_patience = self.config.config_training["early_stopping"]["patience"]
         self.current_iteration = 0
         self.current_epoch = 0
 
@@ -90,7 +90,7 @@ class Trainer():
         self.loss_fn = self.build_loss()
         self.lr_scheduler = self.build_scheduler(
             optimizer=self.optimizer,
-            config_lr_scheduler=self.config.config_training["lr_scheduler"]
+            config_lr_scheduler=self.config.config_lr_scheduler
         )
 
         # Resume training
@@ -101,18 +101,16 @@ class Trainer():
     def build_scheduler(self, optimizer, config_lr_scheduler):
         if not config_lr_scheduler["status"]:
             return None
-
-        scheduler_func = lambda x: lr_lambda_update(x, config_lr_scheduler)
-        lr_scheduler = torch.optim.lr_scheduler.LambdaLR(
+        lr_scheduler = torch.optim.lr_scheduler.StepLR(
             optimizer=optimizer,
-            lr_lambda=scheduler_func
+            step_size=config_lr_scheduler["step_size"],
+            gamma=config_lr_scheduler["gamma"]
         )
         return lr_scheduler
 
 
     def build_loss(self):
-        pad_idx = self.model.word_embedding.common_vocab.get_pad_index()
-        loss_fn = nn.CrossEntropyLoss(ignore_index=pad_idx)
+        loss_fn = nn.CrossEntropyLoss()
         return loss_fn
 
 
@@ -151,24 +149,18 @@ class Trainer():
         """
             Forward to model
         """
-        scores_output, prev_inds = self.model(batch)
-        return scores_output, prev_inds
+        scores_output = self.model(batch)
+        return scores_output
 
 
     def _extract_loss(self, scores, targets):
-        """
-            scores.shape: torch.Size([B, max_length, num_vocab])
-            targets.shape: torch.Size([B, max_length])
-        """
-        num_vocab = scores.size(-1)
-        scores_reshape = scores[:, 1:, :].reshape(-1, num_vocab)
-        targets_reshape = targets[:, 1:].reshape(-1)
+        B, max_length, C = scores.shape
+        scores_flat = scores.view(B * max_length, C)           # [2*30, 6048]
+        targets_flat = targets.view(B * max_length) 
         loss_output = self.loss_fn(
-            # scores, targets
-            scores_reshape, targets_reshape
+            scores_flat, targets_flat
         ) 
         return loss_output
-
 
     def _backward(self, loss):
         """
@@ -181,19 +173,12 @@ class Trainer():
         self._run_scheduler()
     
 
-    def _gradient_clipping(self):
-        nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0)
-
-
     def _run_scheduler(self):
         """
             Learning rate scheduler
         """
+        # self.lr_scheduler.step(self.current_iteration)
         self.lr_scheduler.step()
-        if self.current_iteration % 1000 == 0:
-            lrs = [pg['lr'] for pg in self.optimizer.param_groups]
-            self.writer.LOG_INFO(f"Iteration {self.current_iteration} LRs: {lrs}")
-
 
 
     def _backward(self, loss):
@@ -247,7 +232,6 @@ class Trainer():
         self.writer.LOG_INFO("Starting training...")
         self.model.train()
 
-        best_scores = -1
         while self.current_iteration < self.max_iterations:
             self.current_epoch += 1
             self.writer.LOG_INFO(f"Training epoch: {self.current_epoch}")
@@ -266,52 +250,21 @@ class Trainer():
                 loss = self._extract_loss(scores_output, targets)
                 self._backward(loss)
                 
-                if self.current_iteration > self.max_iterations:
+                if self.current_iteration < self.max_iterations:
                     break
             
-                if self.current_iteration % self.snapshot_interval == 0:
-                    _, _, val_final_scores, loss = self.evaluate(epoch_id=self.current_iteration, split="val")
-                    # _, _, final_scores = self.evaluate(epoch_id=self.current_epoch, split="test")
-                    if val_final_scores["CIDEr"] > best_scores:
-                        self.early_stop_counter = 0
-                        best_scores = val_final_scores["CIDEr"]
-                        self.save_model(
-                            model=self.model,
-                            loss=loss,
-                            optimizer=self.optimizer,
-                            lr_scheduler=self.lr_scheduler,
-                            epoch=self.current_epoch, 
-                            iteration=self.current_iteration,
-                            metric_score=best_scores,
-                            use_name="best"
-                        )
-                    else:
-                        self.early_stop_counter += 1
-                    if self.early_stop_counter >= self.early_stop_patience:
-                        self.writer.LOG_INFO("Early stopping triggered.")
-                        break
-                    
+            if self.current_epoch % 2 == 0:
+                _, _, val_final_scores, loss = self.evaluate(epoch_id=self.current_epoch, split="val")
+                # _, _, final_scores = self.evaluate(epoch_id=self.current_epoch, split="test")
+                if val_final_scores > best_scores:
+                    best_scores = val_final_scores
                     self.save_model(
                         model=self.model,
                         loss=loss,
                         optimizer=self.optimizer,
-                        lr_scheduler=self.lr_scheduler,
                         epoch=self.current_epoch, 
-                        iteration=self.current_iteration,
-                        metric_score=best_scores,
-                        use_name=self.current_iteration
+                        metric_score=best_scores
                     )
-                    self.save_model(
-                        model=self.model,
-                        loss=loss,
-                        optimizer=self.optimizer,
-                        lr_scheduler=self.lr_scheduler,
-                        epoch=self.current_epoch, 
-                        iteration=self.current_iteration,
-                        metric_score=best_scores,
-                        use_name="last"
-                    )
-    
     
     def evaluate(self, epoch_id=None, split="val"):
         if hasattr(self, f"{split}_loader"):
@@ -320,7 +273,7 @@ class Trainer():
             self.writer_evaluation.LOG_ERROR(f"No dataloader for {split} split")
             raise ModuleNotFoundError
         
-        with torch.no_grad():
+        with torch.inference_mode():
             hypo: dict = {}
             ref : dict = {}
             losses = []
@@ -332,55 +285,45 @@ class Trainer():
                 list_ocr_tokens = batch["list_ocr_tokens"]
                 list_captions = batch["list_captions"]
                 batch = self.preprocess_batch(batch)
-                batch = self.match_device(batch)
                 
                 #~ Calculate loss
                 scores_output, pred_inds = self._forward_pass(batch)
                 targets = self.model.word_embedding.get_prev_inds(
                     list_captions, list_ocr_tokens
                 ).to(self.device)
-
                 loss = self._extract_loss(scores_output, targets)
-                loss_scalar = loss.detach().cpu().item()
-                ic(loss_scalar)
-                losses.append(loss_scalar)
-                
+                losses.append(loss)
                 #~ Metrics calculation
                 if not epoch_id==None:
                     self.writer_evaluation.LOG_INFO(f"Logging at epoch {epoch_id}")
                 
-                pred_caps = self.get_pred_captions(pred_inds, list_ocr_tokens)
-                ic(pred_caps)
+                pred_caps = self.get_pred_captions(scores_output, list_ocr_tokens)
                 for id, pred_cap, ref_cap in zip(list_id, pred_caps, list_captions):
                     hypo[id] = [pred_cap]
                     ref[id]  = [ref_cap]
             
             # Calculate Metrics
-            # ic(ref, hypo)
             final_scores = metric_calculate(ref, hypo)
-            # ic(losses)
-            avg_loss = sum(losses) / len(losses) 
-            self.writer_evaluation.LOG_INFO(f"|| Metrics Calculation || {split} split || epoch: {epoch_id} || loss: {avg_loss}")
+            loss = sum(losses) / len(losses) 
+            self.writer_evaluation.LOG_INFO(f"|| Metrics Calculation || {split} split || epoch: {epoch_id} || loss: {loss}")
             self.writer_evaluation.LOG_INFO(f"Final scores:\n{final_scores}")
             
             # Turn on train mode to continue training
             self.model.train()
-        return hypo, ref, final_scores, avg_loss
-
-
+        return hypo, ref, final_scores, loss
+    
 
     def inference(self, mode, save_dir):
         """
             Parameters:
                 mode:   Model to run "val" or "test"
         """
-        hypo, ref = {}, {}
         if mode=="val":
             self.writer_inference.LOG_INFO("=== Inference Validation Split ===")
-            hypo, ref, _, _ = self.evaluate(epoch_id="Inference val set", split="val")
+            hypo, ref = self.evaluate(epoch_id="Inference val set", split="val")
         elif mode=="test":
             self.writer_inference.LOG_INFO("=== Inference Test Split ===")
-            hypo, ref, _, _ = self.evaluate(epoch_id="Inference test set", split="test")
+            hypo, ref = self.evaluate(epoch_id="Inference test set", split="test")
         else:
             self.writer_inference.LOG_ERROR(f"No mode available for {mode}")
         
@@ -393,78 +336,55 @@ class Trainer():
         )
         return hypo, ref
 
-
     #---- FINISH
-    def save_model(self, model, loss, optimizer, lr_scheduler, epoch, iteration, metric_score, use_name=""):
-        if not os.path.exists(self.args.save_dir):
-            self.writer.LOG_INFO("Save dir not exist")
-            os.makedirs(self.args.save_dir, exist_ok=True)
+    def save_model(self, model, loss, optimizer, epoch, metric_score):
+        if os.path.exists(self.args.save_dir):
+            self.writer("Save dir not exist")
+            raise FileNotFoundError
         
-        model_path = os.path.join(self.args.save_dir, f"checkpoints/model_{use_name}.pth")
+        model_path = os.path.join(self.args.save_dir, f"model_{epoch}.pth")
         self.writer.LOG_DEBUG(f"Model save at {model_path}")
 
         torch.save({
             'epoch': epoch,
-            "iteration": iteration,
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': optimizer.state_dict(),
-            'scheduler_state_dict': getattr(lr_scheduler, 'state_dict', lambda: None)(),
             'loss': loss,
             "metric_score": metric_score
         }, model_path)
 
     
     def load_model(self, model_path):
-        # ic(self.device)
-        checkpoint = torch.load(model_path, map_location=self.device, weights_only=False)
+        checkpoint = torch.load(model_path, weights_only=True)
         self.model.load_state_dict(checkpoint['model_state_dict'])
         self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-
-        #### DEBUG
-        for param_group in self.optimizer.param_groups:
-            ic(param_group['lr'])
-        #### DEBUG
-
-        self.current_epoch = checkpoint.get('epoch', 0)
-        self.current_iteration = checkpoint.get("iteration", 600)
-        
-        if self.lr_scheduler is not None and 'scheduler_state_dict' in checkpoint and checkpoint['scheduler_state_dict'] is not None:
-            try:
-                self.lr_scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
-            except Exception as e:
-                # fallback: advance scheduler to current_iteration
-                self.writer.LOG_INFO("Warning: failed to load scheduler state; advancing scheduler to iteration")
-                self.lr_scheduler.step(self.current_iteration)
-        else:
-            # ensure scheduler is aligned with optimizer param_group's lrs
-            if self.lr_scheduler is not None:
-                self.lr_scheduler.step(self.current_iteration)
-
+        epoch = checkpoint['epoch']
         loss = checkpoint['loss']
-        self.writer.LOG_INFO(f"=== Load model at epoch: {self.current_epoch} || loss: {loss} ===")
-
-
+        self.writer.LOG_INFO(f"=== Load model at epoch: {epoch} || loss: {loss} ===")
 
     #---- METRIC CALCULATION
-    def get_pred_captions(self, pred_inds, ocr_tokens):
+    def get_pred_captions(self, scores, ocr_tokens):
         """
             Predict batch
         """
+        # Get logits
+        pred_logits = F.softmax(scores, dim=-1)
+        pred_ids = np.argmax(pred_logits, axis=1)
+
         # Captioning
         common_vocab = self.model.word_embedding.common_vocab
         vocab_size = common_vocab.get_size()
         ocr_vocab_object = OCRVocab(ocr_tokens=ocr_tokens)
-        captions_pred = []
-        for i, item_pred_inds in enumerate(pred_inds):
-            get_ocr = ocr_vocab_object[i].get_idx_word
-            words = (
-                common_vocab.get_idx_word(idx.item())
+        captions_pred = [
+            " ".join([
+                common_vocab.get_idx_word(idx)
                 if idx < vocab_size
-                else get_ocr(idx.item() - vocab_size)
-                for idx in item_pred_inds
-            )
-            captions_pred.append(" ".join(words))
-        return captions_pred 
+                else ocr_vocab_object[i].get_idx_word(idx - vocab_size)
+                for idx in item_pred_ids
+            ])
+            for i, item_pred_ids in enumerate(pred_ids)
+        ]
+        return captions_pred # BS, 
     
 
     def save_inference(self, hypo, ref, save_dir, name=""):
@@ -472,7 +392,7 @@ class Trainer():
         inference: dict = {
             id : {
                 "gt": ref[id],
-                "pred": hypo[id],
+                "pred": hypo[id]
             } for id in ref.keys()
         }
         save_json(save_path, content=inference)

@@ -52,27 +52,22 @@ optimizer_attributes:
   params:
     eps: 1.0e-08
     lr: 1.0e-4
-    weight_decay: 0
-  type: Adam
+    weight_decay: 0.01
+  type: AdamW
 training_parameters:
-  epochs: 2
-  batch_size: 4
-  iterations: 9000
+  epochs: 26
+  batch_size: 64
+  early_stopping:
+    patience: 5
   lr_scheduler:
     status: true
     type: "step"
-    step_size: 7000
     gamma : 0.1
-  lr_steps:
-    - 6000
-    - 10000
-  lr_ratio: 0.1
-  use_warmup: true
-  warmup_factor: 0.2
-  warmup_iterations: 1000
-  max_iterations: 12000
-  snapshot_interval: 500
-  monitored_metric: m4c_textcaps/textcaps_bleu4
+    lr_steps:
+      - 7000
+    lr_ratio: 0.1
+  max_iterations: 9000
+  snapshot_interval: 1000
   metric_minimize: false
   seed: 2021
 

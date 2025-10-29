@@ -8,5 +8,12 @@ class Config():
         self.config_model = self.config_base["model_attributes"]
         self.config_optimizer = self.config_base["optimizer_attributes"]
         self.config_training = self.config_base["training_parameters"]
-        self.config_lr_scheduler = self.config_training["lr_scheduler"]
     
+
+    def build_registry(self):
+        registry.set_module("config", name="model_attributes", instance=self.config_model)
+        registry.set_module("config", name="dataset_attributes", instance=self.config_dataset)
+        registry.set_module("config", name="optimizer_attributes", instance=self.config_optimizer)
+        registry.set_module("config", name="training_parameters", instance=self.config_training)
+        registry.set_module("config", name="common", instance=self.config_base)
+            

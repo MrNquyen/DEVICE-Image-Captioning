@@ -12,15 +12,17 @@ if __name__=="__main__":
 
     # -- Get device
     # print(args)
+    config = args.config
     device = args.device
 
     # -- Get config
-    config = load_yml(args.config)
+    config = load_yml(config)
     config_container = Config(config)
 
+    # -- Trainer
     # -- Trainer
     trainer = Trainer(config, args)
     if args.run_type=="train":
         trainer.train()
     elif args.run_type=="inference":
-        trainer.test()
+        trainer.inference(mode="test", save_dir="/datastore/npl/ViInfographicCaps/workspace/baseline/DEVICE/save/results")

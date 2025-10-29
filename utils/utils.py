@@ -68,3 +68,30 @@ def load_list_images_fast(image_paths, num_workers=8, desc="Loading images"):
         images = list(tqdm(executor.map(load_img_cache, image_paths), total=len(image_paths), desc=desc))
     return images
 
+
+#---- Check where nan
+def count_nan(tensor):
+    nan_mask = torch.isnan(tensor)  # Boolean mask where values are NaN
+    nan_count = nan_mask.sum().item()
+    # nan_indices = nan_mask.nonzero(as_tuple=False)
+    return nan_count
+
+def check_requires_grad(module, name="module"):
+    trainable, frozen = 0, 0
+    for n, p in module.named_parameters():
+        if p.requires_grad:
+            print(f"[Trainable] {name}.{n}: {tuple(p.shape)}")
+            trainable += 1
+        else:
+            print(f"[Frozen]    {name}.{n}: {tuple(p.shape)}")
+            frozen += 1
+    print(f"\nSummary for {name}: {trainable} trainable / {frozen} frozen parameters\n")
+
+
+def set_seed(seed):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False

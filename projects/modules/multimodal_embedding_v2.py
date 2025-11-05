@@ -7,6 +7,7 @@ from projects.modules.depth_enhance_update import DeFUM
 from projects.modules.semantic_guide_alignment import SgAM
 from utils.module_utils import fasttext_embedding_module, _batch_padding_string
 from utils.phoc.build_phoc_v2 import build_phoc
+from utils.registry import registry
 from utils.vocab import PretrainedVocab, OCRVocab
 from tqdm import tqdm
 from time import time
@@ -225,10 +226,10 @@ class OCREmbedding(BaseEmbedding):
         )
         self.SgAM = SgAM(
             model_clip=model_clip,
-            sgam_config=config["sgam"],
+            sgam_config=self.config["sgam"],
             processor_clip=processor_clip,
             fasttext_model=fasttext_model,
-            hidden_size=config["hidden_size"]
+            hidden_size=self.config["hidden_size"]
         )
 
 

@@ -10,10 +10,10 @@ from tqdm import tqdm
 from icecream import ic
 from torch.optim.lr_scheduler import LambdaLR
 
-from datasets.dataset import get_loader
+from projects.datasets.dataset import get_loader
 from projects.models.device_model import DEVICE
 from utils.configs import Config
-from utils.model_utils import get_optimizer_parameters
+from utils.model_utils import get_optimizer_parameters, lr_lambda_update
 from utils.module_utils import _batch_padding, _batch_padding_string
 from utils.logger import Logger
 from utils.vocab import OCRVocab

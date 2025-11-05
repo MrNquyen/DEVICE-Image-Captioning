@@ -2,16 +2,13 @@
 dataset_attributes:
   depth_images_dir: /datastore/npl/ViInfographicCaps/data/depth_images_npy
   image_features:
-    # train: /datastore/npl/ViInfographicCaps/data/swintextspotter, /datastore/npl/ViInfographicCaps/data/faster_rcnn
-    train: /datastore/npl/ViInfographicCaps/data/swintextspotter, /datastore/npl/ViInfographicCaps/data/faster_rcnn
-    val: /datastore/npl/ViInfographicCaps/data/swintextspotter, /datastore/npl/ViInfographicCaps/data/faster_rcnn
-    test: /datastore/npl/ViInfographicCaps/data/swintextspotter, /datastore/npl/ViInfographicCaps/data/faster_rcnn
-    # - open_images/detectron_fix_100/fc6/test,m4c_textvqa_ocr_en_frcn_features/test_images
+    train: /datastore/npl/ViInfographicCaps/data/swintextspotter, /datastore/npl/ViInfographicCaps/data/yolo_object
+    val: /datastore/npl/ViInfographicCaps/data/swintextspotter, /datastore/npl/ViInfographicCaps/data/yolo_object
+    test: /datastore/npl/ViInfographicCaps/data/swintextspotter, /datastore/npl/ViInfographicCaps/data/yolo_object
   imdb_files:
-    # train: /data/npl/ViInfographicCaps/data/train_imdb.npy
-    train: /datastore/npl/ViInfographicCaps/workspace/baseline/DEVICE/DEVICE-Image-Captioning/data/train_imdb.npy
-    val: /datastore/npl/ViInfographicCaps/workspace/baseline/DEVICE/DEVICE-Image-Captioning/data/val_imdb.npy
-    test: /datastore/npl/ViInfographicCaps/workspace/baseline/DEVICE/DEVICE-Image-Captioning/data/test_imdb.npy
+    train: /datastore/npl/ViInfographicCaps/data/imdb/train_imdb_yolo_new.npy
+    val: /datastore/npl/ViInfographicCaps/data/imdb/val_imdb_yolo_new.npy
+    test: /datastore/npl/ViInfographicCaps/data/imdb/test_imdb_yolo_new.npy
 model_attributes:
   image_dir: /datastore/npl/ViInfographicCaps/data/images
   model_clip: /datastore/npl/ViInfographicCaps/model/clip-vit-large-patch14
@@ -24,7 +21,7 @@ model_attributes:
     dim: 256
     num_ocr: 100
   obj:
-    dim: 1024
+    dim: 320
     num_obj: 100
   feature_dim: 2048 # d
   defum:
@@ -66,6 +63,9 @@ training_parameters:
     lr_steps:
       - 7000
     lr_ratio: 0.1
+    use_warmup: True
+    warmup_iterations: 1
+    warmup_factor: 0.5
   max_iterations: 9000
   snapshot_interval: 1000
   metric_minimize: false

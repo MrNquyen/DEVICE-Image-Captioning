@@ -28,5 +28,5 @@ class Flags:
         )
 
         self.parser.add_argument(
-            "--device", type=int, default=0, help="Set device"
+            "--device", type=str, default="cuda:0", help="Set device"
         )

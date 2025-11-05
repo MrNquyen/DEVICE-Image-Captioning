@@ -23,7 +23,7 @@ class ViInforgraphicDataset(Dataset):
 
             #-- OCR and OBJ feat
             ocr_feat_path = os.path.join(ocr_feat_dir, f"{im_id}.npy")
-            obj_feat_path = os.path.join(obj_feat_dir, f"features/{im_id}.npy")
+            obj_feat_path = os.path.join(obj_feat_dir, f"{im_id}.npy")
             depth_image_path = os.path.join(depth_images_dir, f"{im_id}.npy")
             
             ocr_feat = load_npy(ocr_feat_path)

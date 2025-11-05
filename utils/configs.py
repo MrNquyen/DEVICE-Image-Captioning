@@ -1,3 +1,5 @@
+from utils.registry import registry
+
 class Config():
     def __init__(self, config):
         self.config_base = config

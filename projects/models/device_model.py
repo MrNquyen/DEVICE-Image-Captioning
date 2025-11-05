@@ -59,7 +59,7 @@ class DEVICE(BaseModel):
             :params config: Model Config
             :params device: device cuda
         """
-        super().__init__(config, device)
+        super().__init__()
         self.build()
 
 

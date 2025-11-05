@@ -262092,3 +262092,1926 @@ DEVICE(
 Starting training...
 Training epoch: 1
 Training batch: 1
+=== START BUILDING ===
+=== START BUILDING ===
+=== START BUILDING ===
+=== Build model params ===
+=== Build model pretrained ===
+=== Build model layers ===
+=== START BUILDING ===
+=== Build model params ===
+=== Build model pretrained ===
+=== Build model layers ===
+=== START BUILDING ===
+=== Build model params ===
+=== Build model pretrained ===
+=== Build model layers ===
+=== START BUILDING ===
+=== Build model params ===
+=== Build model pretrained ===
+=== Build model layers ===
+=== Build model sync ===
+=== Build model output ===
+=== Build model decoder ===
+=== Build Adjust learning rate ===
+=== START BUILDING ===
+=== Build model params ===
+=== Build model pretrained ===
+=== Build model layers ===
+=== Build model sync ===
+=== Build model output ===
+=== Build model decoder ===
+=== Build Adjust learning rate ===
+=== START BUILDING ===
+=== Build model params ===
+=== Build model pretrained ===
+=== Build model layers ===
+=== Build model sync ===
+=== Build model output ===
+=== Build model decoder ===
+=== Build Adjust learning rate ===
+=== START BUILDING ===
+=== Build model params ===
+=== Build model pretrained ===
+=== Build model layers ===
+=== Build model sync ===
+=== Build model output ===
+=== Build model decoder ===
+=== Build Adjust learning rate ===
+=== START BUILDING ===
+=== Build model params ===
+=== Build model pretrained ===
+=== Build model layers ===
+=== Build model sync ===
+=== Build model output ===
+=== Build model decoder ===
+=== Build Adjust learning rate ===
+=== START BUILDING ===
+=== Build model params ===
+=== Build model pretrained ===
+=== Build model layers ===
+=== Build model sync ===
+=== Build model output ===
+=== Build model decoder ===
+=== Build Adjust learning rate ===
+=== START BUILDING ===
+=== Build model params ===
+=== Build model pretrained ===
+=== Build model layers ===
+=== Build model sync ===
+=== Build model output ===
+=== Build model decoder ===
+=== Build Adjust learning rate ===
+=== START BUILDING ===
+=== Build model params ===
+=== Build model pretrained ===
+=== Build model layers ===
+=== Build model sync ===
+=== Build model output ===
+=== Build model decoder ===
+=== Build Adjust learning rate ===
+=== START BUILDING ===
+=== Build model params ===
+=== Build model pretrained ===
+=== Build model layers ===
+=== Build model sync ===
+=== Build model output ===
+=== Build model decoder ===
+=== Build Adjust learning rate ===
+=== START BUILDING ===
+=== Build model params ===
+=== Build model pretrained ===
+=== Build model layers ===
+=== Build model sync ===
+=== Build model output ===
+=== Build model decoder ===
+=== Build Adjust learning rate ===
+=== START BUILDING ===
+=== Build model params ===
+=== Build model pretrained ===
+=== Build model layers ===
+=== Build model sync ===
+=== Build model output ===
+=== Build model decoder ===
+=== Build Adjust learning rate ===
+=== START BUILDING ===
+=== Build model params ===
+=== Build model pretrained ===
+=== Build model layers ===
+=== Build model sync ===
+=== Build model output ===
+=== Build model decoder ===
+=== Build Adjust learning rate ===
+=== Model ===
+DEVICE(
+  (model_clip): CLIPModel(
+    (text_model): CLIPTextTransformer(
+      (embeddings): CLIPTextEmbeddings(
+        (token_embedding): Embedding(49408, 768)
+        (position_embedding): Embedding(77, 768)
+      )
+      (encoder): CLIPEncoder(
+        (layers): ModuleList(
+          (0-11): 12 x CLIPEncoderLayer(
+            (self_attn): CLIPAttention(
+              (k_proj): Linear(in_features=768, out_features=768, bias=True)
+              (v_proj): Linear(in_features=768, out_features=768, bias=True)
+              (q_proj): Linear(in_features=768, out_features=768, bias=True)
+              (out_proj): Linear(in_features=768, out_features=768, bias=True)
+            )
+            (layer_norm1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+            (mlp): CLIPMLP(
+              (activation_fn): QuickGELUActivation()
+              (fc1): Linear(in_features=768, out_features=3072, bias=True)
+              (fc2): Linear(in_features=3072, out_features=768, bias=True)
+            )
+            (layer_norm2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          )
+        )
+      )
+      (final_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    )
+    (vision_model): CLIPVisionTransformer(
+      (embeddings): CLIPVisionEmbeddings(
+        (patch_embedding): Conv2d(3, 1024, kernel_size=(14, 14), stride=(14, 14), bias=False)
+        (position_embedding): Embedding(257, 1024)
+      )
+      (pre_layrnorm): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+      (encoder): CLIPEncoder(
+        (layers): ModuleList(
+          (0-23): 24 x CLIPEncoderLayer(
+            (self_attn): CLIPAttention(
+              (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+              (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+              (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+              (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+            )
+            (layer_norm1): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+            (mlp): CLIPMLP(
+              (activation_fn): QuickGELUActivation()
+              (fc1): Linear(in_features=1024, out_features=4096, bias=True)
+              (fc2): Linear(in_features=4096, out_features=1024, bias=True)
+            )
+            (layer_norm2): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+          )
+        )
+      )
+      (post_layernorm): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+    )
+    (visual_projection): Linear(in_features=1024, out_features=768, bias=False)
+    (text_projection): Linear(in_features=768, out_features=768, bias=False)
+  )
+  (pretrained_model): RobertaModel(
+    (embeddings): RobertaEmbeddings(
+      (word_embeddings): Embedding(64001, 768, padding_idx=1)
+      (position_embeddings): Embedding(258, 768, padding_idx=1)
+      (token_type_embeddings): Embedding(1, 768)
+      (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+      (dropout): Dropout(p=0.1, inplace=False)
+    )
+    (encoder): RobertaEncoder(
+      (layer): ModuleList(
+        (0-3): 4 x RobertaLayer(
+          (attention): RobertaAttention(
+            (self): RobertaSdpaSelfAttention(
+              (query): Linear(in_features=768, out_features=768, bias=True)
+              (key): Linear(in_features=768, out_features=768, bias=True)
+              (value): Linear(in_features=768, out_features=768, bias=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+            (output): RobertaSelfOutput(
+              (dense): Linear(in_features=768, out_features=768, bias=True)
+              (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+          )
+          (intermediate): RobertaIntermediate(
+            (dense): Linear(in_features=768, out_features=3072, bias=True)
+            (intermediate_act_fn): GELUActivation()
+          )
+          (output): RobertaOutput(
+            (dense): Linear(in_features=3072, out_features=768, bias=True)
+            (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+          )
+        )
+      )
+    )
+    (pooler): RobertaPooler(
+      (dense): Linear(in_features=768, out_features=768, bias=True)
+      (activation): Tanh()
+    )
+  )
+  (obj_embedding): ObjEmbedding(
+    (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    (linear_feat): Linear(in_features=2048, out_features=768, bias=True)
+    (linear_box): Linear(in_features=5, out_features=768, bias=True)
+  )
+  (ocr_embedding): OCREmbedding(
+    (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    (linear_out_defum): Linear(in_features=2048, out_features=768, bias=True)
+    (linear_out_sgam): Linear(in_features=300, out_features=768, bias=True)
+    (linear_out_phoc): Linear(in_features=1810, out_features=768, bias=True)
+    (linear_out_ocr_boxes): Linear(in_features=5, out_features=768, bias=True)
+    (linear_out_ocr_conf): Linear(in_features=1, out_features=768, bias=True)
+    (DeFUM): DeFUM(
+      (transformer_encoder): TransformerEncoder(
+        (layers): ModuleList(
+          (0-99): 100 x TransformerEncoderLayer(
+            (self_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=2048, out_features=2048, bias=True)
+            )
+            (linear1): Linear(in_features=2048, out_features=2048, bias=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+            (linear2): Linear(in_features=2048, out_features=2048, bias=True)
+            (norm1): LayerNorm((2048,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((2048,), eps=1e-05, elementwise_affine=True)
+            (dropout1): Dropout(p=0.1, inplace=False)
+            (dropout2): Dropout(p=0.1, inplace=False)
+          )
+        )
+      )
+      (LayerNorm): LayerNorm((2048,), eps=1e-05, elementwise_affine=True)
+      (softmax): Softmax(dim=-1)
+      (semantic_attention): SemanticAttentionDeFUM(
+        (q_linear): Linear(in_features=2048, out_features=2048, bias=True)
+        (k_linear): Linear(in_features=2048, out_features=2048, bias=True)
+        (v_linear): Linear(in_features=2048, out_features=2048, bias=True)
+      )
+    )
+    (SgAM): SgAM(
+      (model): CLIPModel(
+        (text_model): CLIPTextTransformer(
+          (embeddings): CLIPTextEmbeddings(
+            (token_embedding): Embedding(49408, 768)
+            (position_embedding): Embedding(77, 768)
+          )
+          (encoder): CLIPEncoder(
+            (layers): ModuleList(
+              (0-11): 12 x CLIPEncoderLayer(
+                (self_attn): CLIPAttention(
+                  (k_proj): Linear(in_features=768, out_features=768, bias=True)
+                  (v_proj): Linear(in_features=768, out_features=768, bias=True)
+                  (q_proj): Linear(in_features=768, out_features=768, bias=True)
+                  (out_proj): Linear(in_features=768, out_features=768, bias=True)
+                )
+                (layer_norm1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+                (mlp): CLIPMLP(
+                  (activation_fn): QuickGELUActivation()
+                  (fc1): Linear(in_features=768, out_features=3072, bias=True)
+                  (fc2): Linear(in_features=3072, out_features=768, bias=True)
+                )
+                (layer_norm2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+              )
+            )
+          )
+          (final_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        )
+        (vision_model): CLIPVisionTransformer(
+          (embeddings): CLIPVisionEmbeddings(
+            (patch_embedding): Conv2d(3, 1024, kernel_size=(14, 14), stride=(14, 14), bias=False)
+            (position_embedding): Embedding(257, 1024)
+          )
+          (pre_layrnorm): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+          (encoder): CLIPEncoder(
+            (layers): ModuleList(
+              (0-23): 24 x CLIPEncoderLayer(
+                (self_attn): CLIPAttention(
+                  (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                  (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                  (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                  (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                )
+                (layer_norm1): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+                (mlp): CLIPMLP(
+                  (activation_fn): QuickGELUActivation()
+                  (fc1): Linear(in_features=1024, out_features=4096, bias=True)
+                  (fc2): Linear(in_features=4096, out_features=1024, bias=True)
+                )
+                (layer_norm2): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+              )
+            )
+          )
+          (post_layernorm): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+        )
+        (visual_projection): Linear(in_features=1024, out_features=768, bias=False)
+        (text_projection): Linear(in_features=768, out_features=768, bias=False)
+      )
+      (salient_object_extractor): SaVOExtractor(
+        (model): CLIPModel(
+          (text_model): CLIPTextTransformer(
+            (embeddings): CLIPTextEmbeddings(
+              (token_embedding): Embedding(49408, 768)
+              (position_embedding): Embedding(77, 768)
+            )
+            (encoder): CLIPEncoder(
+              (layers): ModuleList(
+                (0-11): 12 x CLIPEncoderLayer(
+                  (self_attn): CLIPAttention(
+                    (k_proj): Linear(in_features=768, out_features=768, bias=True)
+                    (v_proj): Linear(in_features=768, out_features=768, bias=True)
+                    (q_proj): Linear(in_features=768, out_features=768, bias=True)
+                    (out_proj): Linear(in_features=768, out_features=768, bias=True)
+                  )
+                  (layer_norm1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+                  (mlp): CLIPMLP(
+                    (activation_fn): QuickGELUActivation()
+                    (fc1): Linear(in_features=768, out_features=3072, bias=True)
+                    (fc2): Linear(in_features=3072, out_features=768, bias=True)
+                  )
+                  (layer_norm2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+                )
+              )
+            )
+            (final_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          )
+          (vision_model): CLIPVisionTransformer(
+            (embeddings): CLIPVisionEmbeddings(
+              (patch_embedding): Conv2d(3, 1024, kernel_size=(14, 14), stride=(14, 14), bias=False)
+              (position_embedding): Embedding(257, 1024)
+            )
+            (pre_layrnorm): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+            (encoder): CLIPEncoder(
+              (layers): ModuleList(
+                (0-23): 24 x CLIPEncoderLayer(
+                  (self_attn): CLIPAttention(
+                    (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                    (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                    (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                    (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                  )
+                  (layer_norm1): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+                  (mlp): CLIPMLP(
+                    (activation_fn): QuickGELUActivation()
+                    (fc1): Linear(in_features=1024, out_features=4096, bias=True)
+                    (fc2): Linear(in_features=4096, out_features=1024, bias=True)
+                  )
+                  (layer_norm2): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+                )
+              )
+            )
+            (post_layernorm): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+          )
+          (visual_projection): Linear(in_features=1024, out_features=768, bias=False)
+          (text_projection): Linear(in_features=768, out_features=768, bias=False)
+        )
+        (linear_voc): Linear(in_features=300, out_features=768, bias=True)
+        (LayerNorm_voc): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        (linear_score): Linear(in_features=1, out_features=768, bias=True)
+        (LayerNorm_score): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+      )
+      (semantic_attention): SemanticAttentionSgAM(
+        (q_linear): Linear(in_features=300, out_features=300, bias=True)
+        (k_linear): Linear(in_features=300, out_features=300, bias=True)
+        (v_linear): Linear(in_features=300, out_features=300, bias=True)
+      )
+    )
+  )
+  (word_embedding): WordEmbedding(
+    (model): RobertaModel(
+      (embeddings): RobertaEmbeddings(
+        (word_embeddings): Embedding(64001, 768, padding_idx=1)
+        (position_embeddings): Embedding(258, 768, padding_idx=1)
+        (token_type_embeddings): Embedding(1, 768)
+        (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        (dropout): Dropout(p=0.1, inplace=False)
+      )
+      (encoder): RobertaEncoder(
+        (layer): ModuleList(
+          (0-3): 4 x RobertaLayer(
+            (attention): RobertaAttention(
+              (self): RobertaSdpaSelfAttention(
+                (query): Linear(in_features=768, out_features=768, bias=True)
+                (key): Linear(in_features=768, out_features=768, bias=True)
+                (value): Linear(in_features=768, out_features=768, bias=True)
+                (dropout): Dropout(p=0.1, inplace=False)
+              )
+              (output): RobertaSelfOutput(
+                (dense): Linear(in_features=768, out_features=768, bias=True)
+                (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+                (dropout): Dropout(p=0.1, inplace=False)
+              )
+            )
+            (intermediate): RobertaIntermediate(
+              (dense): Linear(in_features=768, out_features=3072, bias=True)
+              (intermediate_act_fn): GELUActivation()
+            )
+            (output): RobertaOutput(
+              (dense): Linear(in_features=3072, out_features=768, bias=True)
+              (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+          )
+        )
+      )
+      (pooler): RobertaPooler(
+        (dense): Linear(in_features=768, out_features=768, bias=True)
+        (activation): Tanh()
+      )
+    )
+    (common_vocab): PretrainedVocab(
+      (model): RobertaModel(
+        (embeddings): RobertaEmbeddings(
+          (word_embeddings): Embedding(64001, 768, padding_idx=1)
+          (position_embeddings): Embedding(258, 768, padding_idx=1)
+          (token_type_embeddings): Embedding(1, 768)
+          (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          (dropout): Dropout(p=0.1, inplace=False)
+        )
+        (encoder): RobertaEncoder(
+          (layer): ModuleList(
+            (0-3): 4 x RobertaLayer(
+              (attention): RobertaAttention(
+                (self): RobertaSdpaSelfAttention(
+                  (query): Linear(in_features=768, out_features=768, bias=True)
+                  (key): Linear(in_features=768, out_features=768, bias=True)
+                  (value): Linear(in_features=768, out_features=768, bias=True)
+                  (dropout): Dropout(p=0.1, inplace=False)
+                )
+                (output): RobertaSelfOutput(
+                  (dense): Linear(in_features=768, out_features=768, bias=True)
+                  (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+                  (dropout): Dropout(p=0.1, inplace=False)
+                )
+              )
+              (intermediate): RobertaIntermediate(
+                (dense): Linear(in_features=768, out_features=3072, bias=True)
+                (intermediate_act_fn): GELUActivation()
+              )
+              (output): RobertaOutput(
+                (dense): Linear(in_features=3072, out_features=768, bias=True)
+                (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+                (dropout): Dropout(p=0.1, inplace=False)
+              )
+            )
+          )
+        )
+        (pooler): RobertaPooler(
+          (dense): Linear(in_features=768, out_features=768, bias=True)
+          (activation): Tanh()
+        )
+      )
+      (vectors): Embedding(5948, 768)
+    )
+  )
+  (ocr_ptr_net): OcrPtrNet(
+    (query): Linear(in_features=768, out_features=5948, bias=True)
+    (key): Linear(in_features=768, out_features=5948, bias=True)
+  )
+  (sync_ocr): Sync(
+    (sync): Linear(in_features=256, out_features=2048, bias=True)
+  )
+  (sync_obj): Sync(
+    (sync): Linear(in_features=1024, out_features=2048, bias=True)
+  )
+  (classifier): Linear(in_features=768, out_features=5948, bias=True)
+  (decoder): EncoderAsDecoder(
+    (pretrained_model): RobertaModel(
+      (embeddings): RobertaEmbeddings(
+        (word_embeddings): Embedding(64001, 768, padding_idx=1)
+        (position_embeddings): Embedding(258, 768, padding_idx=1)
+        (token_type_embeddings): Embedding(1, 768)
+        (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        (dropout): Dropout(p=0.1, inplace=False)
+      )
+      (encoder): RobertaEncoder(
+        (layer): ModuleList(
+          (0-3): 4 x RobertaLayer(
+            (attention): RobertaAttention(
+              (self): RobertaSdpaSelfAttention(
+                (query): Linear(in_features=768, out_features=768, bias=True)
+                (key): Linear(in_features=768, out_features=768, bias=True)
+                (value): Linear(in_features=768, out_features=768, bias=True)
+                (dropout): Dropout(p=0.1, inplace=False)
+              )
+              (output): RobertaSelfOutput(
+                (dense): Linear(in_features=768, out_features=768, bias=True)
+                (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+                (dropout): Dropout(p=0.1, inplace=False)
+              )
+            )
+            (intermediate): RobertaIntermediate(
+              (dense): Linear(in_features=768, out_features=3072, bias=True)
+              (intermediate_act_fn): GELUActivation()
+            )
+            (output): RobertaOutput(
+              (dense): Linear(in_features=3072, out_features=768, bias=True)
+              (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+          )
+        )
+      )
+      (pooler): RobertaPooler(
+        (dense): Linear(in_features=768, out_features=768, bias=True)
+        (activation): Tanh()
+      )
+    )
+    (encoder): RobertaEncoder(
+      (layer): ModuleList(
+        (0-3): 4 x RobertaLayer(
+          (attention): RobertaAttention(
+            (self): RobertaSdpaSelfAttention(
+              (query): Linear(in_features=768, out_features=768, bias=True)
+              (key): Linear(in_features=768, out_features=768, bias=True)
+              (value): Linear(in_features=768, out_features=768, bias=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+            (output): RobertaSelfOutput(
+              (dense): Linear(in_features=768, out_features=768, bias=True)
+              (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+          )
+          (intermediate): RobertaIntermediate(
+            (dense): Linear(in_features=768, out_features=3072, bias=True)
+            (intermediate_act_fn): GELUActivation()
+          )
+          (output): RobertaOutput(
+            (dense): Linear(in_features=3072, out_features=768, bias=True)
+            (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+          )
+        )
+      )
+    )
+    (prev_embedding): PrevEmbedding(
+      (positional_embedding): Embedding(32, 768)
+      (token_type_embedding): Embedding(2, 768)
+      (common_voc_embedding_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+      (emb_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+      (ocr_embedding_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+      (emb_dropout): Dropout(p=0.1, inplace=False)
+    )
+    (ocr_semantic_linear): Linear(in_features=300, out_features=768, bias=True)
+  )
+)
+Starting training...
+Training epoch: 1
+Training batch: 1
+=== START BUILDING ===
+=== Build model params ===
+=== Build model pretrained ===
+=== Build model layers ===
+=== Build model sync ===
+=== Build model output ===
+=== Build model decoder ===
+=== Build Adjust learning rate ===
+=== Model ===
+DEVICE(
+  (model_clip): CLIPModel(
+    (text_model): CLIPTextTransformer(
+      (embeddings): CLIPTextEmbeddings(
+        (token_embedding): Embedding(49408, 768)
+        (position_embedding): Embedding(77, 768)
+      )
+      (encoder): CLIPEncoder(
+        (layers): ModuleList(
+          (0-11): 12 x CLIPEncoderLayer(
+            (self_attn): CLIPAttention(
+              (k_proj): Linear(in_features=768, out_features=768, bias=True)
+              (v_proj): Linear(in_features=768, out_features=768, bias=True)
+              (q_proj): Linear(in_features=768, out_features=768, bias=True)
+              (out_proj): Linear(in_features=768, out_features=768, bias=True)
+            )
+            (layer_norm1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+            (mlp): CLIPMLP(
+              (activation_fn): QuickGELUActivation()
+              (fc1): Linear(in_features=768, out_features=3072, bias=True)
+              (fc2): Linear(in_features=3072, out_features=768, bias=True)
+            )
+            (layer_norm2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          )
+        )
+      )
+      (final_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    )
+    (vision_model): CLIPVisionTransformer(
+      (embeddings): CLIPVisionEmbeddings(
+        (patch_embedding): Conv2d(3, 1024, kernel_size=(14, 14), stride=(14, 14), bias=False)
+        (position_embedding): Embedding(257, 1024)
+      )
+      (pre_layrnorm): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+      (encoder): CLIPEncoder(
+        (layers): ModuleList(
+          (0-23): 24 x CLIPEncoderLayer(
+            (self_attn): CLIPAttention(
+              (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+              (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+              (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+              (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+            )
+            (layer_norm1): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+            (mlp): CLIPMLP(
+              (activation_fn): QuickGELUActivation()
+              (fc1): Linear(in_features=1024, out_features=4096, bias=True)
+              (fc2): Linear(in_features=4096, out_features=1024, bias=True)
+            )
+            (layer_norm2): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+          )
+        )
+      )
+      (post_layernorm): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+    )
+    (visual_projection): Linear(in_features=1024, out_features=768, bias=False)
+    (text_projection): Linear(in_features=768, out_features=768, bias=False)
+  )
+  (pretrained_model): RobertaModel(
+    (embeddings): RobertaEmbeddings(
+      (word_embeddings): Embedding(64001, 768, padding_idx=1)
+      (position_embeddings): Embedding(258, 768, padding_idx=1)
+      (token_type_embeddings): Embedding(1, 768)
+      (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+      (dropout): Dropout(p=0.1, inplace=False)
+    )
+    (encoder): RobertaEncoder(
+      (layer): ModuleList(
+        (0-3): 4 x RobertaLayer(
+          (attention): RobertaAttention(
+            (self): RobertaSdpaSelfAttention(
+              (query): Linear(in_features=768, out_features=768, bias=True)
+              (key): Linear(in_features=768, out_features=768, bias=True)
+              (value): Linear(in_features=768, out_features=768, bias=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+            (output): RobertaSelfOutput(
+              (dense): Linear(in_features=768, out_features=768, bias=True)
+              (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+          )
+          (intermediate): RobertaIntermediate(
+            (dense): Linear(in_features=768, out_features=3072, bias=True)
+            (intermediate_act_fn): GELUActivation()
+          )
+          (output): RobertaOutput(
+            (dense): Linear(in_features=3072, out_features=768, bias=True)
+            (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+          )
+        )
+      )
+    )
+    (pooler): RobertaPooler(
+      (dense): Linear(in_features=768, out_features=768, bias=True)
+      (activation): Tanh()
+    )
+  )
+  (obj_embedding): ObjEmbedding(
+    (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    (linear_feat): Linear(in_features=2048, out_features=768, bias=True)
+    (linear_box): Linear(in_features=5, out_features=768, bias=True)
+  )
+  (ocr_embedding): OCREmbedding(
+    (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    (linear_out_defum): Linear(in_features=2048, out_features=768, bias=True)
+    (linear_out_sgam): Linear(in_features=300, out_features=768, bias=True)
+    (linear_out_phoc): Linear(in_features=1810, out_features=768, bias=True)
+    (linear_out_ocr_boxes): Linear(in_features=5, out_features=768, bias=True)
+    (linear_out_ocr_conf): Linear(in_features=1, out_features=768, bias=True)
+    (DeFUM): DeFUM(
+      (transformer_encoder): TransformerEncoder(
+        (layers): ModuleList(
+          (0-99): 100 x TransformerEncoderLayer(
+            (self_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=2048, out_features=2048, bias=True)
+            )
+            (linear1): Linear(in_features=2048, out_features=2048, bias=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+            (linear2): Linear(in_features=2048, out_features=2048, bias=True)
+            (norm1): LayerNorm((2048,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((2048,), eps=1e-05, elementwise_affine=True)
+            (dropout1): Dropout(p=0.1, inplace=False)
+            (dropout2): Dropout(p=0.1, inplace=False)
+          )
+        )
+      )
+      (LayerNorm): LayerNorm((2048,), eps=1e-05, elementwise_affine=True)
+      (softmax): Softmax(dim=-1)
+      (semantic_attention): SemanticAttentionDeFUM(
+        (q_linear): Linear(in_features=2048, out_features=2048, bias=True)
+        (k_linear): Linear(in_features=2048, out_features=2048, bias=True)
+        (v_linear): Linear(in_features=2048, out_features=2048, bias=True)
+      )
+    )
+    (SgAM): SgAM(
+      (model): CLIPModel(
+        (text_model): CLIPTextTransformer(
+          (embeddings): CLIPTextEmbeddings(
+            (token_embedding): Embedding(49408, 768)
+            (position_embedding): Embedding(77, 768)
+          )
+          (encoder): CLIPEncoder(
+            (layers): ModuleList(
+              (0-11): 12 x CLIPEncoderLayer(
+                (self_attn): CLIPAttention(
+                  (k_proj): Linear(in_features=768, out_features=768, bias=True)
+                  (v_proj): Linear(in_features=768, out_features=768, bias=True)
+                  (q_proj): Linear(in_features=768, out_features=768, bias=True)
+                  (out_proj): Linear(in_features=768, out_features=768, bias=True)
+                )
+                (layer_norm1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+                (mlp): CLIPMLP(
+                  (activation_fn): QuickGELUActivation()
+                  (fc1): Linear(in_features=768, out_features=3072, bias=True)
+                  (fc2): Linear(in_features=3072, out_features=768, bias=True)
+                )
+                (layer_norm2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+              )
+            )
+          )
+          (final_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        )
+        (vision_model): CLIPVisionTransformer(
+          (embeddings): CLIPVisionEmbeddings(
+            (patch_embedding): Conv2d(3, 1024, kernel_size=(14, 14), stride=(14, 14), bias=False)
+            (position_embedding): Embedding(257, 1024)
+          )
+          (pre_layrnorm): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+          (encoder): CLIPEncoder(
+            (layers): ModuleList(
+              (0-23): 24 x CLIPEncoderLayer(
+                (self_attn): CLIPAttention(
+                  (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                  (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                  (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                  (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                )
+                (layer_norm1): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+                (mlp): CLIPMLP(
+                  (activation_fn): QuickGELUActivation()
+                  (fc1): Linear(in_features=1024, out_features=4096, bias=True)
+                  (fc2): Linear(in_features=4096, out_features=1024, bias=True)
+                )
+                (layer_norm2): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+              )
+            )
+          )
+          (post_layernorm): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+        )
+        (visual_projection): Linear(in_features=1024, out_features=768, bias=False)
+        (text_projection): Linear(in_features=768, out_features=768, bias=False)
+      )
+      (salient_object_extractor): SaVOExtractor(
+        (model): CLIPModel(
+          (text_model): CLIPTextTransformer(
+            (embeddings): CLIPTextEmbeddings(
+              (token_embedding): Embedding(49408, 768)
+              (position_embedding): Embedding(77, 768)
+            )
+            (encoder): CLIPEncoder(
+              (layers): ModuleList(
+                (0-11): 12 x CLIPEncoderLayer(
+                  (self_attn): CLIPAttention(
+                    (k_proj): Linear(in_features=768, out_features=768, bias=True)
+                    (v_proj): Linear(in_features=768, out_features=768, bias=True)
+                    (q_proj): Linear(in_features=768, out_features=768, bias=True)
+                    (out_proj): Linear(in_features=768, out_features=768, bias=True)
+                  )
+                  (layer_norm1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+                  (mlp): CLIPMLP(
+                    (activation_fn): QuickGELUActivation()
+                    (fc1): Linear(in_features=768, out_features=3072, bias=True)
+                    (fc2): Linear(in_features=3072, out_features=768, bias=True)
+                  )
+                  (layer_norm2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+                )
+              )
+            )
+            (final_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          )
+          (vision_model): CLIPVisionTransformer(
+            (embeddings): CLIPVisionEmbeddings(
+              (patch_embedding): Conv2d(3, 1024, kernel_size=(14, 14), stride=(14, 14), bias=False)
+              (position_embedding): Embedding(257, 1024)
+            )
+            (pre_layrnorm): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+            (encoder): CLIPEncoder(
+              (layers): ModuleList(
+                (0-23): 24 x CLIPEncoderLayer(
+                  (self_attn): CLIPAttention(
+                    (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                    (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                    (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                    (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                  )
+                  (layer_norm1): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+                  (mlp): CLIPMLP(
+                    (activation_fn): QuickGELUActivation()
+                    (fc1): Linear(in_features=1024, out_features=4096, bias=True)
+                    (fc2): Linear(in_features=4096, out_features=1024, bias=True)
+                  )
+                  (layer_norm2): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+                )
+              )
+            )
+            (post_layernorm): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+          )
+          (visual_projection): Linear(in_features=1024, out_features=768, bias=False)
+          (text_projection): Linear(in_features=768, out_features=768, bias=False)
+        )
+        (linear_voc): Linear(in_features=300, out_features=768, bias=True)
+        (LayerNorm_voc): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        (linear_score): Linear(in_features=1, out_features=768, bias=True)
+        (LayerNorm_score): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+      )
+      (semantic_attention): SemanticAttentionSgAM(
+        (q_linear): Linear(in_features=300, out_features=300, bias=True)
+        (k_linear): Linear(in_features=300, out_features=300, bias=True)
+        (v_linear): Linear(in_features=300, out_features=300, bias=True)
+      )
+    )
+  )
+  (word_embedding): WordEmbedding(
+    (model): RobertaModel(
+      (embeddings): RobertaEmbeddings(
+        (word_embeddings): Embedding(64001, 768, padding_idx=1)
+        (position_embeddings): Embedding(258, 768, padding_idx=1)
+        (token_type_embeddings): Embedding(1, 768)
+        (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        (dropout): Dropout(p=0.1, inplace=False)
+      )
+      (encoder): RobertaEncoder(
+        (layer): ModuleList(
+          (0-3): 4 x RobertaLayer(
+            (attention): RobertaAttention(
+              (self): RobertaSdpaSelfAttention(
+                (query): Linear(in_features=768, out_features=768, bias=True)
+                (key): Linear(in_features=768, out_features=768, bias=True)
+                (value): Linear(in_features=768, out_features=768, bias=True)
+                (dropout): Dropout(p=0.1, inplace=False)
+              )
+              (output): RobertaSelfOutput(
+                (dense): Linear(in_features=768, out_features=768, bias=True)
+                (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+                (dropout): Dropout(p=0.1, inplace=False)
+              )
+            )
+            (intermediate): RobertaIntermediate(
+              (dense): Linear(in_features=768, out_features=3072, bias=True)
+              (intermediate_act_fn): GELUActivation()
+            )
+            (output): RobertaOutput(
+              (dense): Linear(in_features=3072, out_features=768, bias=True)
+              (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+          )
+        )
+      )
+      (pooler): RobertaPooler(
+        (dense): Linear(in_features=768, out_features=768, bias=True)
+        (activation): Tanh()
+      )
+    )
+    (common_vocab): PretrainedVocab(
+      (model): RobertaModel(
+        (embeddings): RobertaEmbeddings(
+          (word_embeddings): Embedding(64001, 768, padding_idx=1)
+          (position_embeddings): Embedding(258, 768, padding_idx=1)
+          (token_type_embeddings): Embedding(1, 768)
+          (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          (dropout): Dropout(p=0.1, inplace=False)
+        )
+        (encoder): RobertaEncoder(
+          (layer): ModuleList(
+            (0-3): 4 x RobertaLayer(
+              (attention): RobertaAttention(
+                (self): RobertaSdpaSelfAttention(
+                  (query): Linear(in_features=768, out_features=768, bias=True)
+                  (key): Linear(in_features=768, out_features=768, bias=True)
+                  (value): Linear(in_features=768, out_features=768, bias=True)
+                  (dropout): Dropout(p=0.1, inplace=False)
+                )
+                (output): RobertaSelfOutput(
+                  (dense): Linear(in_features=768, out_features=768, bias=True)
+                  (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+                  (dropout): Dropout(p=0.1, inplace=False)
+                )
+              )
+              (intermediate): RobertaIntermediate(
+                (dense): Linear(in_features=768, out_features=3072, bias=True)
+                (intermediate_act_fn): GELUActivation()
+              )
+              (output): RobertaOutput(
+                (dense): Linear(in_features=3072, out_features=768, bias=True)
+                (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+                (dropout): Dropout(p=0.1, inplace=False)
+              )
+            )
+          )
+        )
+        (pooler): RobertaPooler(
+          (dense): Linear(in_features=768, out_features=768, bias=True)
+          (activation): Tanh()
+        )
+      )
+      (vectors): Embedding(5948, 768)
+    )
+  )
+  (ocr_ptr_net): OcrPtrNet(
+    (query): Linear(in_features=768, out_features=5948, bias=True)
+    (key): Linear(in_features=768, out_features=5948, bias=True)
+  )
+  (sync_ocr): Sync(
+    (sync): Linear(in_features=256, out_features=2048, bias=True)
+  )
+  (sync_obj): Sync(
+    (sync): Linear(in_features=320, out_features=2048, bias=True)
+  )
+  (classifier): Linear(in_features=768, out_features=5948, bias=True)
+  (decoder): EncoderAsDecoder(
+    (pretrained_model): RobertaModel(
+      (embeddings): RobertaEmbeddings(
+        (word_embeddings): Embedding(64001, 768, padding_idx=1)
+        (position_embeddings): Embedding(258, 768, padding_idx=1)
+        (token_type_embeddings): Embedding(1, 768)
+        (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        (dropout): Dropout(p=0.1, inplace=False)
+      )
+      (encoder): RobertaEncoder(
+        (layer): ModuleList(
+          (0-3): 4 x RobertaLayer(
+            (attention): RobertaAttention(
+              (self): RobertaSdpaSelfAttention(
+                (query): Linear(in_features=768, out_features=768, bias=True)
+                (key): Linear(in_features=768, out_features=768, bias=True)
+                (value): Linear(in_features=768, out_features=768, bias=True)
+                (dropout): Dropout(p=0.1, inplace=False)
+              )
+              (output): RobertaSelfOutput(
+                (dense): Linear(in_features=768, out_features=768, bias=True)
+                (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+                (dropout): Dropout(p=0.1, inplace=False)
+              )
+            )
+            (intermediate): RobertaIntermediate(
+              (dense): Linear(in_features=768, out_features=3072, bias=True)
+              (intermediate_act_fn): GELUActivation()
+            )
+            (output): RobertaOutput(
+              (dense): Linear(in_features=3072, out_features=768, bias=True)
+              (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+          )
+        )
+      )
+      (pooler): RobertaPooler(
+        (dense): Linear(in_features=768, out_features=768, bias=True)
+        (activation): Tanh()
+      )
+    )
+    (encoder): RobertaEncoder(
+      (layer): ModuleList(
+        (0-3): 4 x RobertaLayer(
+          (attention): RobertaAttention(
+            (self): RobertaSdpaSelfAttention(
+              (query): Linear(in_features=768, out_features=768, bias=True)
+              (key): Linear(in_features=768, out_features=768, bias=True)
+              (value): Linear(in_features=768, out_features=768, bias=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+            (output): RobertaSelfOutput(
+              (dense): Linear(in_features=768, out_features=768, bias=True)
+              (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+          )
+          (intermediate): RobertaIntermediate(
+            (dense): Linear(in_features=768, out_features=3072, bias=True)
+            (intermediate_act_fn): GELUActivation()
+          )
+          (output): RobertaOutput(
+            (dense): Linear(in_features=3072, out_features=768, bias=True)
+            (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+          )
+        )
+      )
+    )
+    (prev_embedding): PrevEmbedding(
+      (positional_embedding): Embedding(32, 768)
+      (token_type_embedding): Embedding(2, 768)
+      (common_voc_embedding_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+      (emb_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+      (ocr_embedding_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+      (emb_dropout): Dropout(p=0.1, inplace=False)
+    )
+    (ocr_semantic_linear): Linear(in_features=300, out_features=768, bias=True)
+  )
+)
+Starting training...
+Training epoch: 1
+Training batch: 1
+=== START BUILDING ===
+=== Build model params ===
+=== Build model pretrained ===
+=== Build model layers ===
+=== Build model sync ===
+=== Build model output ===
+=== Build model decoder ===
+=== Build Adjust learning rate ===
+=== Model ===
+DEVICE(
+  (model_clip): CLIPModel(
+    (text_model): CLIPTextTransformer(
+      (embeddings): CLIPTextEmbeddings(
+        (token_embedding): Embedding(49408, 768)
+        (position_embedding): Embedding(77, 768)
+      )
+      (encoder): CLIPEncoder(
+        (layers): ModuleList(
+          (0-11): 12 x CLIPEncoderLayer(
+            (self_attn): CLIPAttention(
+              (k_proj): Linear(in_features=768, out_features=768, bias=True)
+              (v_proj): Linear(in_features=768, out_features=768, bias=True)
+              (q_proj): Linear(in_features=768, out_features=768, bias=True)
+              (out_proj): Linear(in_features=768, out_features=768, bias=True)
+            )
+            (layer_norm1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+            (mlp): CLIPMLP(
+              (activation_fn): QuickGELUActivation()
+              (fc1): Linear(in_features=768, out_features=3072, bias=True)
+              (fc2): Linear(in_features=3072, out_features=768, bias=True)
+            )
+            (layer_norm2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          )
+        )
+      )
+      (final_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    )
+    (vision_model): CLIPVisionTransformer(
+      (embeddings): CLIPVisionEmbeddings(
+        (patch_embedding): Conv2d(3, 1024, kernel_size=(14, 14), stride=(14, 14), bias=False)
+        (position_embedding): Embedding(257, 1024)
+      )
+      (pre_layrnorm): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+      (encoder): CLIPEncoder(
+        (layers): ModuleList(
+          (0-23): 24 x CLIPEncoderLayer(
+            (self_attn): CLIPAttention(
+              (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+              (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+              (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+              (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+            )
+            (layer_norm1): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+            (mlp): CLIPMLP(
+              (activation_fn): QuickGELUActivation()
+              (fc1): Linear(in_features=1024, out_features=4096, bias=True)
+              (fc2): Linear(in_features=4096, out_features=1024, bias=True)
+            )
+            (layer_norm2): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+          )
+        )
+      )
+      (post_layernorm): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+    )
+    (visual_projection): Linear(in_features=1024, out_features=768, bias=False)
+    (text_projection): Linear(in_features=768, out_features=768, bias=False)
+  )
+  (pretrained_model): RobertaModel(
+    (embeddings): RobertaEmbeddings(
+      (word_embeddings): Embedding(64001, 768, padding_idx=1)
+      (position_embeddings): Embedding(258, 768, padding_idx=1)
+      (token_type_embeddings): Embedding(1, 768)
+      (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+      (dropout): Dropout(p=0.1, inplace=False)
+    )
+    (encoder): RobertaEncoder(
+      (layer): ModuleList(
+        (0-3): 4 x RobertaLayer(
+          (attention): RobertaAttention(
+            (self): RobertaSdpaSelfAttention(
+              (query): Linear(in_features=768, out_features=768, bias=True)
+              (key): Linear(in_features=768, out_features=768, bias=True)
+              (value): Linear(in_features=768, out_features=768, bias=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+            (output): RobertaSelfOutput(
+              (dense): Linear(in_features=768, out_features=768, bias=True)
+              (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+          )
+          (intermediate): RobertaIntermediate(
+            (dense): Linear(in_features=768, out_features=3072, bias=True)
+            (intermediate_act_fn): GELUActivation()
+          )
+          (output): RobertaOutput(
+            (dense): Linear(in_features=3072, out_features=768, bias=True)
+            (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+          )
+        )
+      )
+    )
+    (pooler): RobertaPooler(
+      (dense): Linear(in_features=768, out_features=768, bias=True)
+      (activation): Tanh()
+    )
+  )
+  (obj_embedding): ObjEmbedding(
+    (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    (linear_feat): Linear(in_features=2048, out_features=768, bias=True)
+    (linear_box): Linear(in_features=5, out_features=768, bias=True)
+  )
+  (ocr_embedding): OCREmbedding(
+    (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    (linear_out_defum): Linear(in_features=2048, out_features=768, bias=True)
+    (linear_out_sgam): Linear(in_features=300, out_features=768, bias=True)
+    (linear_out_phoc): Linear(in_features=1810, out_features=768, bias=True)
+    (linear_out_ocr_boxes): Linear(in_features=5, out_features=768, bias=True)
+    (linear_out_ocr_conf): Linear(in_features=1, out_features=768, bias=True)
+    (DeFUM): DeFUM(
+      (transformer_encoder): TransformerEncoder(
+        (layers): ModuleList(
+          (0-99): 100 x TransformerEncoderLayer(
+            (self_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=2048, out_features=2048, bias=True)
+            )
+            (linear1): Linear(in_features=2048, out_features=2048, bias=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+            (linear2): Linear(in_features=2048, out_features=2048, bias=True)
+            (norm1): LayerNorm((2048,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((2048,), eps=1e-05, elementwise_affine=True)
+            (dropout1): Dropout(p=0.1, inplace=False)
+            (dropout2): Dropout(p=0.1, inplace=False)
+          )
+        )
+      )
+      (LayerNorm): LayerNorm((2048,), eps=1e-05, elementwise_affine=True)
+      (softmax): Softmax(dim=-1)
+      (semantic_attention): SemanticAttentionDeFUM(
+        (q_linear): Linear(in_features=2048, out_features=2048, bias=True)
+        (k_linear): Linear(in_features=2048, out_features=2048, bias=True)
+        (v_linear): Linear(in_features=2048, out_features=2048, bias=True)
+      )
+    )
+    (SgAM): SgAM(
+      (model): CLIPModel(
+        (text_model): CLIPTextTransformer(
+          (embeddings): CLIPTextEmbeddings(
+            (token_embedding): Embedding(49408, 768)
+            (position_embedding): Embedding(77, 768)
+          )
+          (encoder): CLIPEncoder(
+            (layers): ModuleList(
+              (0-11): 12 x CLIPEncoderLayer(
+                (self_attn): CLIPAttention(
+                  (k_proj): Linear(in_features=768, out_features=768, bias=True)
+                  (v_proj): Linear(in_features=768, out_features=768, bias=True)
+                  (q_proj): Linear(in_features=768, out_features=768, bias=True)
+                  (out_proj): Linear(in_features=768, out_features=768, bias=True)
+                )
+                (layer_norm1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+                (mlp): CLIPMLP(
+                  (activation_fn): QuickGELUActivation()
+                  (fc1): Linear(in_features=768, out_features=3072, bias=True)
+                  (fc2): Linear(in_features=3072, out_features=768, bias=True)
+                )
+                (layer_norm2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+              )
+            )
+          )
+          (final_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        )
+        (vision_model): CLIPVisionTransformer(
+          (embeddings): CLIPVisionEmbeddings(
+            (patch_embedding): Conv2d(3, 1024, kernel_size=(14, 14), stride=(14, 14), bias=False)
+            (position_embedding): Embedding(257, 1024)
+          )
+          (pre_layrnorm): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+          (encoder): CLIPEncoder(
+            (layers): ModuleList(
+              (0-23): 24 x CLIPEncoderLayer(
+                (self_attn): CLIPAttention(
+                  (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                  (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                  (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                  (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                )
+                (layer_norm1): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+                (mlp): CLIPMLP(
+                  (activation_fn): QuickGELUActivation()
+                  (fc1): Linear(in_features=1024, out_features=4096, bias=True)
+                  (fc2): Linear(in_features=4096, out_features=1024, bias=True)
+                )
+                (layer_norm2): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+              )
+            )
+          )
+          (post_layernorm): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+        )
+        (visual_projection): Linear(in_features=1024, out_features=768, bias=False)
+        (text_projection): Linear(in_features=768, out_features=768, bias=False)
+      )
+      (salient_object_extractor): SaVOExtractor(
+        (model): CLIPModel(
+          (text_model): CLIPTextTransformer(
+            (embeddings): CLIPTextEmbeddings(
+              (token_embedding): Embedding(49408, 768)
+              (position_embedding): Embedding(77, 768)
+            )
+            (encoder): CLIPEncoder(
+              (layers): ModuleList(
+                (0-11): 12 x CLIPEncoderLayer(
+                  (self_attn): CLIPAttention(
+                    (k_proj): Linear(in_features=768, out_features=768, bias=True)
+                    (v_proj): Linear(in_features=768, out_features=768, bias=True)
+                    (q_proj): Linear(in_features=768, out_features=768, bias=True)
+                    (out_proj): Linear(in_features=768, out_features=768, bias=True)
+                  )
+                  (layer_norm1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+                  (mlp): CLIPMLP(
+                    (activation_fn): QuickGELUActivation()
+                    (fc1): Linear(in_features=768, out_features=3072, bias=True)
+                    (fc2): Linear(in_features=3072, out_features=768, bias=True)
+                  )
+                  (layer_norm2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+                )
+              )
+            )
+            (final_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          )
+          (vision_model): CLIPVisionTransformer(
+            (embeddings): CLIPVisionEmbeddings(
+              (patch_embedding): Conv2d(3, 1024, kernel_size=(14, 14), stride=(14, 14), bias=False)
+              (position_embedding): Embedding(257, 1024)
+            )
+            (pre_layrnorm): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+            (encoder): CLIPEncoder(
+              (layers): ModuleList(
+                (0-23): 24 x CLIPEncoderLayer(
+                  (self_attn): CLIPAttention(
+                    (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                    (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                    (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                    (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                  )
+                  (layer_norm1): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+                  (mlp): CLIPMLP(
+                    (activation_fn): QuickGELUActivation()
+                    (fc1): Linear(in_features=1024, out_features=4096, bias=True)
+                    (fc2): Linear(in_features=4096, out_features=1024, bias=True)
+                  )
+                  (layer_norm2): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+                )
+              )
+            )
+            (post_layernorm): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+          )
+          (visual_projection): Linear(in_features=1024, out_features=768, bias=False)
+          (text_projection): Linear(in_features=768, out_features=768, bias=False)
+        )
+        (linear_voc): Linear(in_features=300, out_features=768, bias=True)
+        (LayerNorm_voc): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        (linear_score): Linear(in_features=1, out_features=768, bias=True)
+        (LayerNorm_score): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+      )
+      (semantic_attention): SemanticAttentionSgAM(
+        (q_linear): Linear(in_features=300, out_features=300, bias=True)
+        (k_linear): Linear(in_features=300, out_features=300, bias=True)
+        (v_linear): Linear(in_features=300, out_features=300, bias=True)
+      )
+    )
+  )
+  (word_embedding): WordEmbedding(
+    (model): RobertaModel(
+      (embeddings): RobertaEmbeddings(
+        (word_embeddings): Embedding(64001, 768, padding_idx=1)
+        (position_embeddings): Embedding(258, 768, padding_idx=1)
+        (token_type_embeddings): Embedding(1, 768)
+        (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        (dropout): Dropout(p=0.1, inplace=False)
+      )
+      (encoder): RobertaEncoder(
+        (layer): ModuleList(
+          (0-3): 4 x RobertaLayer(
+            (attention): RobertaAttention(
+              (self): RobertaSdpaSelfAttention(
+                (query): Linear(in_features=768, out_features=768, bias=True)
+                (key): Linear(in_features=768, out_features=768, bias=True)
+                (value): Linear(in_features=768, out_features=768, bias=True)
+                (dropout): Dropout(p=0.1, inplace=False)
+              )
+              (output): RobertaSelfOutput(
+                (dense): Linear(in_features=768, out_features=768, bias=True)
+                (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+                (dropout): Dropout(p=0.1, inplace=False)
+              )
+            )
+            (intermediate): RobertaIntermediate(
+              (dense): Linear(in_features=768, out_features=3072, bias=True)
+              (intermediate_act_fn): GELUActivation()
+            )
+            (output): RobertaOutput(
+              (dense): Linear(in_features=3072, out_features=768, bias=True)
+              (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+          )
+        )
+      )
+      (pooler): RobertaPooler(
+        (dense): Linear(in_features=768, out_features=768, bias=True)
+        (activation): Tanh()
+      )
+    )
+    (common_vocab): PretrainedVocab(
+      (model): RobertaModel(
+        (embeddings): RobertaEmbeddings(
+          (word_embeddings): Embedding(64001, 768, padding_idx=1)
+          (position_embeddings): Embedding(258, 768, padding_idx=1)
+          (token_type_embeddings): Embedding(1, 768)
+          (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          (dropout): Dropout(p=0.1, inplace=False)
+        )
+        (encoder): RobertaEncoder(
+          (layer): ModuleList(
+            (0-3): 4 x RobertaLayer(
+              (attention): RobertaAttention(
+                (self): RobertaSdpaSelfAttention(
+                  (query): Linear(in_features=768, out_features=768, bias=True)
+                  (key): Linear(in_features=768, out_features=768, bias=True)
+                  (value): Linear(in_features=768, out_features=768, bias=True)
+                  (dropout): Dropout(p=0.1, inplace=False)
+                )
+                (output): RobertaSelfOutput(
+                  (dense): Linear(in_features=768, out_features=768, bias=True)
+                  (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+                  (dropout): Dropout(p=0.1, inplace=False)
+                )
+              )
+              (intermediate): RobertaIntermediate(
+                (dense): Linear(in_features=768, out_features=3072, bias=True)
+                (intermediate_act_fn): GELUActivation()
+              )
+              (output): RobertaOutput(
+                (dense): Linear(in_features=3072, out_features=768, bias=True)
+                (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+                (dropout): Dropout(p=0.1, inplace=False)
+              )
+            )
+          )
+        )
+        (pooler): RobertaPooler(
+          (dense): Linear(in_features=768, out_features=768, bias=True)
+          (activation): Tanh()
+        )
+      )
+      (vectors): Embedding(5948, 768)
+    )
+  )
+  (ocr_ptr_net): OcrPtrNet(
+    (query): Linear(in_features=768, out_features=5948, bias=True)
+    (key): Linear(in_features=768, out_features=5948, bias=True)
+  )
+  (sync_ocr): Sync(
+    (sync): Linear(in_features=256, out_features=2048, bias=True)
+  )
+  (sync_obj): Sync(
+    (sync): Linear(in_features=320, out_features=2048, bias=True)
+  )
+  (classifier): Linear(in_features=768, out_features=5948, bias=True)
+  (decoder): EncoderAsDecoder(
+    (pretrained_model): RobertaModel(
+      (embeddings): RobertaEmbeddings(
+        (word_embeddings): Embedding(64001, 768, padding_idx=1)
+        (position_embeddings): Embedding(258, 768, padding_idx=1)
+        (token_type_embeddings): Embedding(1, 768)
+        (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        (dropout): Dropout(p=0.1, inplace=False)
+      )
+      (encoder): RobertaEncoder(
+        (layer): ModuleList(
+          (0-3): 4 x RobertaLayer(
+            (attention): RobertaAttention(
+              (self): RobertaSdpaSelfAttention(
+                (query): Linear(in_features=768, out_features=768, bias=True)
+                (key): Linear(in_features=768, out_features=768, bias=True)
+                (value): Linear(in_features=768, out_features=768, bias=True)
+                (dropout): Dropout(p=0.1, inplace=False)
+              )
+              (output): RobertaSelfOutput(
+                (dense): Linear(in_features=768, out_features=768, bias=True)
+                (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+                (dropout): Dropout(p=0.1, inplace=False)
+              )
+            )
+            (intermediate): RobertaIntermediate(
+              (dense): Linear(in_features=768, out_features=3072, bias=True)
+              (intermediate_act_fn): GELUActivation()
+            )
+            (output): RobertaOutput(
+              (dense): Linear(in_features=3072, out_features=768, bias=True)
+              (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+          )
+        )
+      )
+      (pooler): RobertaPooler(
+        (dense): Linear(in_features=768, out_features=768, bias=True)
+        (activation): Tanh()
+      )
+    )
+    (encoder): RobertaEncoder(
+      (layer): ModuleList(
+        (0-3): 4 x RobertaLayer(
+          (attention): RobertaAttention(
+            (self): RobertaSdpaSelfAttention(
+              (query): Linear(in_features=768, out_features=768, bias=True)
+              (key): Linear(in_features=768, out_features=768, bias=True)
+              (value): Linear(in_features=768, out_features=768, bias=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+            (output): RobertaSelfOutput(
+              (dense): Linear(in_features=768, out_features=768, bias=True)
+              (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+          )
+          (intermediate): RobertaIntermediate(
+            (dense): Linear(in_features=768, out_features=3072, bias=True)
+            (intermediate_act_fn): GELUActivation()
+          )
+          (output): RobertaOutput(
+            (dense): Linear(in_features=3072, out_features=768, bias=True)
+            (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+          )
+        )
+      )
+    )
+    (prev_embedding): PrevEmbedding(
+      (positional_embedding): Embedding(32, 768)
+      (token_type_embedding): Embedding(2, 768)
+      (common_voc_embedding_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+      (emb_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+      (ocr_embedding_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+      (emb_dropout): Dropout(p=0.1, inplace=False)
+    )
+    (ocr_semantic_linear): Linear(in_features=300, out_features=768, bias=True)
+  )
+)
+Starting training...
+Training epoch: 1
+Training batch: 1
+=== START BUILDING ===
+=== START BUILDING ===
+=== Build model params ===
+=== Build model pretrained ===
+=== Build model layers ===
+=== Build model sync ===
+=== Build model output ===
+=== Build model decoder ===
+=== Build Adjust learning rate ===
+=== Model ===
+DEVICE(
+  (model_clip): CLIPModel(
+    (text_model): CLIPTextTransformer(
+      (embeddings): CLIPTextEmbeddings(
+        (token_embedding): Embedding(49408, 768)
+        (position_embedding): Embedding(77, 768)
+      )
+      (encoder): CLIPEncoder(
+        (layers): ModuleList(
+          (0-11): 12 x CLIPEncoderLayer(
+            (self_attn): CLIPAttention(
+              (k_proj): Linear(in_features=768, out_features=768, bias=True)
+              (v_proj): Linear(in_features=768, out_features=768, bias=True)
+              (q_proj): Linear(in_features=768, out_features=768, bias=True)
+              (out_proj): Linear(in_features=768, out_features=768, bias=True)
+            )
+            (layer_norm1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+            (mlp): CLIPMLP(
+              (activation_fn): QuickGELUActivation()
+              (fc1): Linear(in_features=768, out_features=3072, bias=True)
+              (fc2): Linear(in_features=3072, out_features=768, bias=True)
+            )
+            (layer_norm2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          )
+        )
+      )
+      (final_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    )
+    (vision_model): CLIPVisionTransformer(
+      (embeddings): CLIPVisionEmbeddings(
+        (patch_embedding): Conv2d(3, 1024, kernel_size=(14, 14), stride=(14, 14), bias=False)
+        (position_embedding): Embedding(257, 1024)
+      )
+      (pre_layrnorm): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+      (encoder): CLIPEncoder(
+        (layers): ModuleList(
+          (0-23): 24 x CLIPEncoderLayer(
+            (self_attn): CLIPAttention(
+              (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+              (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+              (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+              (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+            )
+            (layer_norm1): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+            (mlp): CLIPMLP(
+              (activation_fn): QuickGELUActivation()
+              (fc1): Linear(in_features=1024, out_features=4096, bias=True)
+              (fc2): Linear(in_features=4096, out_features=1024, bias=True)
+            )
+            (layer_norm2): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+          )
+        )
+      )
+      (post_layernorm): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+    )
+    (visual_projection): Linear(in_features=1024, out_features=768, bias=False)
+    (text_projection): Linear(in_features=768, out_features=768, bias=False)
+  )
+  (pretrained_model): RobertaModel(
+    (embeddings): RobertaEmbeddings(
+      (word_embeddings): Embedding(64001, 768, padding_idx=1)
+      (position_embeddings): Embedding(258, 768, padding_idx=1)
+      (token_type_embeddings): Embedding(1, 768)
+      (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+      (dropout): Dropout(p=0.1, inplace=False)
+    )
+    (encoder): RobertaEncoder(
+      (layer): ModuleList(
+        (0-3): 4 x RobertaLayer(
+          (attention): RobertaAttention(
+            (self): RobertaSdpaSelfAttention(
+              (query): Linear(in_features=768, out_features=768, bias=True)
+              (key): Linear(in_features=768, out_features=768, bias=True)
+              (value): Linear(in_features=768, out_features=768, bias=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+            (output): RobertaSelfOutput(
+              (dense): Linear(in_features=768, out_features=768, bias=True)
+              (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+          )
+          (intermediate): RobertaIntermediate(
+            (dense): Linear(in_features=768, out_features=3072, bias=True)
+            (intermediate_act_fn): GELUActivation()
+          )
+          (output): RobertaOutput(
+            (dense): Linear(in_features=3072, out_features=768, bias=True)
+            (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+          )
+        )
+      )
+    )
+    (pooler): RobertaPooler(
+      (dense): Linear(in_features=768, out_features=768, bias=True)
+      (activation): Tanh()
+    )
+  )
+  (obj_embedding): ObjEmbedding(
+    (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    (linear_feat): Linear(in_features=2048, out_features=768, bias=True)
+    (linear_box): Linear(in_features=5, out_features=768, bias=True)
+  )
+  (ocr_embedding): OCREmbedding(
+    (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+    (linear_out_defum): Linear(in_features=2048, out_features=768, bias=True)
+    (linear_out_sgam): Linear(in_features=300, out_features=768, bias=True)
+    (linear_out_phoc): Linear(in_features=1810, out_features=768, bias=True)
+    (linear_out_ocr_boxes): Linear(in_features=5, out_features=768, bias=True)
+    (linear_out_ocr_conf): Linear(in_features=1, out_features=768, bias=True)
+    (DeFUM): DeFUM(
+      (transformer_encoder): TransformerEncoder(
+        (layers): ModuleList(
+          (0-99): 100 x TransformerEncoderLayer(
+            (self_attn): MultiheadAttention(
+              (out_proj): NonDynamicallyQuantizableLinear(in_features=2048, out_features=2048, bias=True)
+            )
+            (linear1): Linear(in_features=2048, out_features=2048, bias=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+            (linear2): Linear(in_features=2048, out_features=2048, bias=True)
+            (norm1): LayerNorm((2048,), eps=1e-05, elementwise_affine=True)
+            (norm2): LayerNorm((2048,), eps=1e-05, elementwise_affine=True)
+            (dropout1): Dropout(p=0.1, inplace=False)
+            (dropout2): Dropout(p=0.1, inplace=False)
+          )
+        )
+      )
+      (LayerNorm): LayerNorm((2048,), eps=1e-05, elementwise_affine=True)
+      (softmax): Softmax(dim=-1)
+      (semantic_attention): SemanticAttentionDeFUM(
+        (q_linear): Linear(in_features=2048, out_features=2048, bias=True)
+        (k_linear): Linear(in_features=2048, out_features=2048, bias=True)
+        (v_linear): Linear(in_features=2048, out_features=2048, bias=True)
+      )
+    )
+    (SgAM): SgAM(
+      (model): CLIPModel(
+        (text_model): CLIPTextTransformer(
+          (embeddings): CLIPTextEmbeddings(
+            (token_embedding): Embedding(49408, 768)
+            (position_embedding): Embedding(77, 768)
+          )
+          (encoder): CLIPEncoder(
+            (layers): ModuleList(
+              (0-11): 12 x CLIPEncoderLayer(
+                (self_attn): CLIPAttention(
+                  (k_proj): Linear(in_features=768, out_features=768, bias=True)
+                  (v_proj): Linear(in_features=768, out_features=768, bias=True)
+                  (q_proj): Linear(in_features=768, out_features=768, bias=True)
+                  (out_proj): Linear(in_features=768, out_features=768, bias=True)
+                )
+                (layer_norm1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+                (mlp): CLIPMLP(
+                  (activation_fn): QuickGELUActivation()
+                  (fc1): Linear(in_features=768, out_features=3072, bias=True)
+                  (fc2): Linear(in_features=3072, out_features=768, bias=True)
+                )
+                (layer_norm2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+              )
+            )
+          )
+          (final_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        )
+        (vision_model): CLIPVisionTransformer(
+          (embeddings): CLIPVisionEmbeddings(
+            (patch_embedding): Conv2d(3, 1024, kernel_size=(14, 14), stride=(14, 14), bias=False)
+            (position_embedding): Embedding(257, 1024)
+          )
+          (pre_layrnorm): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+          (encoder): CLIPEncoder(
+            (layers): ModuleList(
+              (0-23): 24 x CLIPEncoderLayer(
+                (self_attn): CLIPAttention(
+                  (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                  (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                  (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                  (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                )
+                (layer_norm1): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+                (mlp): CLIPMLP(
+                  (activation_fn): QuickGELUActivation()
+                  (fc1): Linear(in_features=1024, out_features=4096, bias=True)
+                  (fc2): Linear(in_features=4096, out_features=1024, bias=True)
+                )
+                (layer_norm2): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+              )
+            )
+          )
+          (post_layernorm): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+        )
+        (visual_projection): Linear(in_features=1024, out_features=768, bias=False)
+        (text_projection): Linear(in_features=768, out_features=768, bias=False)
+      )
+      (salient_object_extractor): SaVOExtractor(
+        (model): CLIPModel(
+          (text_model): CLIPTextTransformer(
+            (embeddings): CLIPTextEmbeddings(
+              (token_embedding): Embedding(49408, 768)
+              (position_embedding): Embedding(77, 768)
+            )
+            (encoder): CLIPEncoder(
+              (layers): ModuleList(
+                (0-11): 12 x CLIPEncoderLayer(
+                  (self_attn): CLIPAttention(
+                    (k_proj): Linear(in_features=768, out_features=768, bias=True)
+                    (v_proj): Linear(in_features=768, out_features=768, bias=True)
+                    (q_proj): Linear(in_features=768, out_features=768, bias=True)
+                    (out_proj): Linear(in_features=768, out_features=768, bias=True)
+                  )
+                  (layer_norm1): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+                  (mlp): CLIPMLP(
+                    (activation_fn): QuickGELUActivation()
+                    (fc1): Linear(in_features=768, out_features=3072, bias=True)
+                    (fc2): Linear(in_features=3072, out_features=768, bias=True)
+                  )
+                  (layer_norm2): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+                )
+              )
+            )
+            (final_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          )
+          (vision_model): CLIPVisionTransformer(
+            (embeddings): CLIPVisionEmbeddings(
+              (patch_embedding): Conv2d(3, 1024, kernel_size=(14, 14), stride=(14, 14), bias=False)
+              (position_embedding): Embedding(257, 1024)
+            )
+            (pre_layrnorm): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+            (encoder): CLIPEncoder(
+              (layers): ModuleList(
+                (0-23): 24 x CLIPEncoderLayer(
+                  (self_attn): CLIPAttention(
+                    (k_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                    (v_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                    (q_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                    (out_proj): Linear(in_features=1024, out_features=1024, bias=True)
+                  )
+                  (layer_norm1): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+                  (mlp): CLIPMLP(
+                    (activation_fn): QuickGELUActivation()
+                    (fc1): Linear(in_features=1024, out_features=4096, bias=True)
+                    (fc2): Linear(in_features=4096, out_features=1024, bias=True)
+                  )
+                  (layer_norm2): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+                )
+              )
+            )
+            (post_layernorm): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+          )
+          (visual_projection): Linear(in_features=1024, out_features=768, bias=False)
+          (text_projection): Linear(in_features=768, out_features=768, bias=False)
+        )
+        (linear_voc): Linear(in_features=300, out_features=768, bias=True)
+        (LayerNorm_voc): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        (linear_score): Linear(in_features=1, out_features=768, bias=True)
+        (LayerNorm_score): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+      )
+      (semantic_attention): SemanticAttentionSgAM(
+        (q_linear): Linear(in_features=300, out_features=300, bias=True)
+        (k_linear): Linear(in_features=300, out_features=300, bias=True)
+        (v_linear): Linear(in_features=300, out_features=300, bias=True)
+      )
+    )
+  )
+  (word_embedding): WordEmbedding(
+    (model): RobertaModel(
+      (embeddings): RobertaEmbeddings(
+        (word_embeddings): Embedding(64001, 768, padding_idx=1)
+        (position_embeddings): Embedding(258, 768, padding_idx=1)
+        (token_type_embeddings): Embedding(1, 768)
+        (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        (dropout): Dropout(p=0.1, inplace=False)
+      )
+      (encoder): RobertaEncoder(
+        (layer): ModuleList(
+          (0-3): 4 x RobertaLayer(
+            (attention): RobertaAttention(
+              (self): RobertaSdpaSelfAttention(
+                (query): Linear(in_features=768, out_features=768, bias=True)
+                (key): Linear(in_features=768, out_features=768, bias=True)
+                (value): Linear(in_features=768, out_features=768, bias=True)
+                (dropout): Dropout(p=0.1, inplace=False)
+              )
+              (output): RobertaSelfOutput(
+                (dense): Linear(in_features=768, out_features=768, bias=True)
+                (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+                (dropout): Dropout(p=0.1, inplace=False)
+              )
+            )
+            (intermediate): RobertaIntermediate(
+              (dense): Linear(in_features=768, out_features=3072, bias=True)
+              (intermediate_act_fn): GELUActivation()
+            )
+            (output): RobertaOutput(
+              (dense): Linear(in_features=3072, out_features=768, bias=True)
+              (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+          )
+        )
+      )
+      (pooler): RobertaPooler(
+        (dense): Linear(in_features=768, out_features=768, bias=True)
+        (activation): Tanh()
+      )
+    )
+    (common_vocab): PretrainedVocab(
+      (model): RobertaModel(
+        (embeddings): RobertaEmbeddings(
+          (word_embeddings): Embedding(64001, 768, padding_idx=1)
+          (position_embeddings): Embedding(258, 768, padding_idx=1)
+          (token_type_embeddings): Embedding(1, 768)
+          (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+          (dropout): Dropout(p=0.1, inplace=False)
+        )
+        (encoder): RobertaEncoder(
+          (layer): ModuleList(
+            (0-3): 4 x RobertaLayer(
+              (attention): RobertaAttention(
+                (self): RobertaSdpaSelfAttention(
+                  (query): Linear(in_features=768, out_features=768, bias=True)
+                  (key): Linear(in_features=768, out_features=768, bias=True)
+                  (value): Linear(in_features=768, out_features=768, bias=True)
+                  (dropout): Dropout(p=0.1, inplace=False)
+                )
+                (output): RobertaSelfOutput(
+                  (dense): Linear(in_features=768, out_features=768, bias=True)
+                  (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+                  (dropout): Dropout(p=0.1, inplace=False)
+                )
+              )
+              (intermediate): RobertaIntermediate(
+                (dense): Linear(in_features=768, out_features=3072, bias=True)
+                (intermediate_act_fn): GELUActivation()
+              )
+              (output): RobertaOutput(
+                (dense): Linear(in_features=3072, out_features=768, bias=True)
+                (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+                (dropout): Dropout(p=0.1, inplace=False)
+              )
+            )
+          )
+        )
+        (pooler): RobertaPooler(
+          (dense): Linear(in_features=768, out_features=768, bias=True)
+          (activation): Tanh()
+        )
+      )
+      (vectors): Embedding(5948, 768)
+    )
+  )
+  (ocr_ptr_net): OcrPtrNet(
+    (query): Linear(in_features=768, out_features=5948, bias=True)
+    (key): Linear(in_features=768, out_features=5948, bias=True)
+  )
+  (sync_ocr): Sync(
+    (sync): Linear(in_features=256, out_features=2048, bias=True)
+  )
+  (sync_obj): Sync(
+    (sync): Linear(in_features=320, out_features=2048, bias=True)
+  )
+  (classifier): Linear(in_features=768, out_features=5948, bias=True)
+  (decoder): EncoderAsDecoder(
+    (pretrained_model): RobertaModel(
+      (embeddings): RobertaEmbeddings(
+        (word_embeddings): Embedding(64001, 768, padding_idx=1)
+        (position_embeddings): Embedding(258, 768, padding_idx=1)
+        (token_type_embeddings): Embedding(1, 768)
+        (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+        (dropout): Dropout(p=0.1, inplace=False)
+      )
+      (encoder): RobertaEncoder(
+        (layer): ModuleList(
+          (0-3): 4 x RobertaLayer(
+            (attention): RobertaAttention(
+              (self): RobertaSdpaSelfAttention(
+                (query): Linear(in_features=768, out_features=768, bias=True)
+                (key): Linear(in_features=768, out_features=768, bias=True)
+                (value): Linear(in_features=768, out_features=768, bias=True)
+                (dropout): Dropout(p=0.1, inplace=False)
+              )
+              (output): RobertaSelfOutput(
+                (dense): Linear(in_features=768, out_features=768, bias=True)
+                (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+                (dropout): Dropout(p=0.1, inplace=False)
+              )
+            )
+            (intermediate): RobertaIntermediate(
+              (dense): Linear(in_features=768, out_features=3072, bias=True)
+              (intermediate_act_fn): GELUActivation()
+            )
+            (output): RobertaOutput(
+              (dense): Linear(in_features=3072, out_features=768, bias=True)
+              (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+          )
+        )
+      )
+      (pooler): RobertaPooler(
+        (dense): Linear(in_features=768, out_features=768, bias=True)
+        (activation): Tanh()
+      )
+    )
+    (encoder): RobertaEncoder(
+      (layer): ModuleList(
+        (0-3): 4 x RobertaLayer(
+          (attention): RobertaAttention(
+            (self): RobertaSdpaSelfAttention(
+              (query): Linear(in_features=768, out_features=768, bias=True)
+              (key): Linear(in_features=768, out_features=768, bias=True)
+              (value): Linear(in_features=768, out_features=768, bias=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+            (output): RobertaSelfOutput(
+              (dense): Linear(in_features=768, out_features=768, bias=True)
+              (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+          )
+          (intermediate): RobertaIntermediate(
+            (dense): Linear(in_features=768, out_features=3072, bias=True)
+            (intermediate_act_fn): GELUActivation()
+          )
+          (output): RobertaOutput(
+            (dense): Linear(in_features=3072, out_features=768, bias=True)
+            (LayerNorm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+          )
+        )
+      )
+    )
+    (prev_embedding): PrevEmbedding(
+      (positional_embedding): Embedding(32, 768)
+      (token_type_embedding): Embedding(2, 768)
+      (common_voc_embedding_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+      (emb_layer_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+      (ocr_embedding_norm): LayerNorm((768,), eps=1e-05, elementwise_affine=True)
+      (emb_dropout): Dropout(p=0.1, inplace=False)
+    )
+    (ocr_semantic_linear): Linear(in_features=300, out_features=768, bias=True)
+  )
+)
+Starting training...
+Training epoch: 1
+Training batch: 1
